@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>LV's Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0d0f;--surf:#141416;--surf2:#1c1c20;--bdr:#2a2a30;
+    --acc:#e8ff47;--acc2:#ff6b35;--warn:#ff9500;--txt:#f0f0f0;
+    --mut:#6b6b78;--grn:#4ade80;--purp:#a78bfa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{
+    background:var(--bg);color:var(--txt);
+    font-family:'DM Sans',system-ui,sans-serif;
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;padding:24px 20px;
+  }
+
+  /* HEADER */
+  .hub-header{text-align:center;margin-bottom:48px}
+  .hub-eyebrow{
+    font-family:'Bebas Neue',sans-serif;font-size:11px;
+    letter-spacing:4px;color:var(--mut);text-transform:uppercase;margin-bottom:6px
+  }
+  .hub-title{
+    font-family:'Bebas Neue',sans-serif;font-size:52px;
+    letter-spacing:2px;line-height:1;color:var(--txt);
+  }
+  .hub-title span{color:var(--acc)}
+  .hub-sub{font-size:12px;color:var(--mut);margin-top:10px;letter-spacing:.5px}
+  .hub-line{
+    width:40px;height:2px;background:var(--acc);
+    margin:14px auto 0;border-radius:2px
+  }
+
+  /* CARDS */
+  .tools-grid{width:100%;max-width:420px;display:flex;flex-direction:column;gap:12px}
+
+  .tool-card{
+    background:var(--surf);border:1px solid var(--bdr);
+    border-radius:14px;padding:20px 20px 18px;
+    text-decoration:none;display:flex;align-items:center;gap:16px;
+    transition:border-color .2s,background .2s;
+    cursor:pointer;position:relative;overflow:hidden;
+  }
+  .tool-card::before{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(135deg,transparent 60%,rgba(255,255,255,.02));
+    pointer-events:none;
+  }
+  .tool-card:active{background:var(--surf2)}
+
+  .tool-card.c1{border-left:3px solid var(--acc2)}
+  .tool-card.c2{border-left:3px solid var(--acc)}
+  .tool-card.c3{border-left:3px solid var(--purp)}
+
+  .tool-icon{
+    width:48px;height:48px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:24px;flex-shrink:0;
+  }
+  .tool-card.c1 .tool-icon{background:rgba(255,107,53,.12)}
+  .tool-card.c2 .tool-icon{background:rgba(232,255,71,.08)}
+  .tool-card.c3 .tool-icon{background:rgba(167,139,250,.1)}
+
+  .tool-body{flex:1;min-width:0}
+  .tool-tag{
+    font-family:'Bebas Neue',sans-serif;font-size:9px;
+    letter-spacing:2px;text-transform:uppercase;margin-bottom:3px
+  }
+  .tool-card.c1 .tool-tag{color:var(--acc2)}
+  .tool-card.c2 .tool-tag{color:var(--acc)}
+  .tool-card.c3 .tool-tag{color:var(--purp)}
+
+  .tool-name{
+    font-family:'Bebas Neue',sans-serif;font-size:22px;
+    letter-spacing:1px;color:var(--txt);line-height:1;margin-bottom:4px
+  }
+  .tool-desc{font-size:11px;color:var(--mut);line-height:1.5}
+
+  .tool-arrow{
+    font-size:18px;color:var(--mut);flex-shrink:0;margin-left:4px
+  }
+  .tool-card.c1:hover .tool-arrow,.tool-card.c1:active .tool-arrow{color:var(--acc2)}
+  .tool-card.c2:hover .tool-arrow,.tool-card.c2:active .tool-arrow{color:var(--acc)}
+  .tool-card.c3:hover .tool-arrow,.tool-card.c3:active .tool-arrow{color:var(--purp)}
+
+  /* COMING SOON */
+  .tool-card.soon{opacity:.45;cursor:default;pointer-events:none}
+  .soon-badge{
+    position:absolute;top:12px;right:12px;
+    font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+    padding:2px 7px;border-radius:3px;
+    background:rgba(107,107,120,.2);color:var(--mut);border:1px solid var(--bdr)
+  }
+
+  /* FOOTER */
+  .hub-footer{
+    margin-top:48px;text-align:center;
+    font-size:10px;color:var(--mut);letter-spacing:1px;line-height:1.8
+  }
+  .hub-footer strong{color:var(--acc);font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="hub-header">
+  <div class="hub-eyebrow">Tableau de bord personnel</div>
+  <div class="hub-title">LV<span>'s</span> TOOLS</div>
+  <div class="hub-sub">Trail · Performance · Nutrition</div>
+  <div class="hub-line"></div>
+</div>
+
+<div class="tools-grid">
+
+  <a href="https://coach-nutrition.netlify.app" class="tool-card c1" target="_blank">
+    <div class="tool-icon">🥗</div>
+    <div class="tool-body">
+      <div class="tool-tag">Alimentation</div>
+      <div class="tool-name">Nutrition & Recettes</div>
+      <div class="tool-desc">Plans semaine · Macros · Micronutriments · Liste de courses</div>
+    </div>
+    <div class="tool-arrow">→</div>
+  </a>
+
+  <a href="https://skeunou.github.io/coach-renfo/" class="tool-card c2" target="_blank">
+    <div class="tool-icon">💪</div>
+    <div class="tool-body">
+      <div class="tool-tag">Entraînement</div>
+      <div class="tool-name">Renforcement Trail</div>
+      <div class="tool-desc">Fiches séances · Timer récup · Progression · Historique</div>
+    </div>
+    <div class="tool-arrow">→</div>
+  </a>
+
+  <a href="https://skeunou.github.io/coach-wod/" class="tool-card c3" target="_blank">
+    <div class="tool-icon">⚡</div>
+    <div class="tool-body">
+      <div class="tool-tag">CrossFit</div>
+      <div class="tool-name">WOD Generator</div>
+      <div class="tool-desc">AMRAP · EMOM · For Time · Adapté à ta phase trail</div>
+    </div>
+    <div class="tool-arrow">→</div>
+  </a>
+
+</div>
+
+<div class="hub-footer">
+  <strong>LV's TOOLS</strong><br>
+  Construit sur mesure · Données locales · Aucune pub
+</div>
+
+</body>
+</html>
