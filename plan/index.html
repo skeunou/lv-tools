@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>LV Plan — Entraînement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0d0f; --surf:#141416; --surf2:#1c1c20; --bdr:#2a2a30;
+  --acc:#e8ff47; --acc2:#ff6b35; --warn:#ff9500; --txt:#f0f0f0;
+  --mut:#6b6b78; --grn:#4ade80; --red:#f87171; --purp:#a78bfa; --blue:#38bdf8;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;padding-bottom:40px}
+h1,h2,h3,.bebas{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-weight:400}
+header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:2px solid var(--acc);padding:10px 14px}
+.htop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.htop h1{font-size:30px;margin:0;line-height:1}
+.htop h1 span{color:var(--acc)}
+.obj{font-size:11px;color:var(--mut);letter-spacing:.5px;text-transform:uppercase}
+.tabs{display:flex;gap:6px;margin-top:8px}
+.tab{flex:1;text-align:center;padding:8px;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;
+  font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--mut);cursor:pointer}
+.tab.active{background:var(--acc);color:#000;border-color:var(--acc)}
+.wrap{padding:12px 14px;max-width:560px;margin:0 auto}
+.view{display:none}.view.active{display:block}
+
+.banner{background:linear-gradient(90deg,rgba(232,255,71,.12),rgba(255,107,53,.12));
+  border:1px solid var(--acc);border-radius:10px;padding:10px 12px;margin-bottom:12px;display:none}
+.banner.show{display:block}
+.banner b{color:var(--acc)}
+.banner .brow{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px}
+.navbtn{background:var(--surf2);border:1px solid var(--bdr);color:var(--txt);border-radius:8px;
+  width:38px;height:38px;font-size:18px;cursor:pointer}
+.month{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;text-align:center;flex:1}
+.blocklabel{text-align:center;font-size:11px;color:var(--acc2);letter-spacing:.5px;margin-bottom:8px;text-transform:uppercase}
+
+.actions{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.btn{flex:1;min-width:96px;background:var(--surf2);border:1px solid var(--bdr);color:var(--txt);
+  border-radius:8px;padding:9px 6px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;font-weight:500}
+.btn.primary{background:var(--acc);color:#000;border-color:var(--acc);font-weight:700}
+
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow{font-size:10px;color:var(--mut);text-align:center;text-transform:uppercase;letter-spacing:.5px;padding:2px 0}
+.cell{background:var(--surf);border:1px solid var(--bdr);border-radius:7px;min-height:50px;padding:3px 3px 4px;
+  cursor:pointer;position:relative;overflow:hidden}
+.cell.empty{background:transparent;border-color:transparent;cursor:default}
+.cell.today{border-color:var(--acc)}
+.cell .dn{font-size:11px;color:var(--mut);font-weight:700}
+.cell.today .dn{color:var(--acc)}
+.dots{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--mut);background:transparent}
+.dot.done{background:currentColor;border-color:currentColor}
+.dot.t-longue{color:var(--acc2);border-color:var(--acc2)}
+.dot.t-cote{color:var(--acc);border-color:var(--acc)}
+.dot.t-ef{color:var(--grn);border-color:var(--grn)}
+.dot.t-renfo{color:var(--blue);border-color:var(--blue)}
+.dot.t-test{color:var(--purp);border-color:var(--purp)}
+.dot.t-repos{width:6px;height:6px;border:none;background:var(--bdr);margin-top:2px}
+.cell .alldone{position:absolute;top:2px;right:3px;font-size:9px;color:var(--grn)}
+
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;font-size:10px;color:var(--mut)}
+.legend span{display:flex;align-items:center;gap:4px}
+.lg{width:9px;height:9px;border-radius:50%}
+
+/* sheet / modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex}
+.sheet{background:var(--surf);width:100%;max-width:560px;border-radius:14px 14px 0 0;border-top:2px solid var(--acc);
+  padding:14px 16px 24px;max-height:86vh;overflow:auto}
+.sheet h3{font-size:22px;margin:0 0 2px}
+.sheet .sub{font-size:12px;color:var(--mut);margin-bottom:12px}
+.sess{border:1px solid var(--bdr);border-radius:10px;padding:10px;margin-bottom:10px;border-left-width:4px}
+.sess.t-longue{border-left-color:var(--acc2)} .sess.t-cote{border-left-color:var(--acc)}
+.sess.t-ef{border-left-color:var(--grn)} .sess.t-renfo{border-left-color:var(--blue)}
+.sess.t-test{border-left-color:var(--purp)} .sess.t-repos{border-left-color:var(--mut)}
+.sess .stitle{font-weight:700;font-size:14px}
+.sess .sdet{font-size:12px;color:var(--mut);margin:4px 0 8px;line-height:1.4}
+.sess .srpe{font-size:11px;color:var(--acc);letter-spacing:.3px}
+.ctrl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+.donebtn{background:var(--surf2);border:1px solid var(--bdr);color:var(--txt);border-radius:8px;padding:7px 12px;
+  font-size:13px;cursor:pointer;font-weight:600}
+.donebtn.on{background:var(--grn);color:#000;border-color:var(--grn)}
+select,input.note{background:var(--surf2);border:1px solid var(--bdr);color:var(--txt);border-radius:8px;
+  padding:7px;font-family:'DM Sans',sans-serif;font-size:13px}
+input.note{flex:1;min-width:120px}
+.fb{display:flex;gap:5px}
+.fbb{background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;padding:6px 9px;font-size:15px;cursor:pointer}
+.fbb.on{background:var(--acc);border-color:var(--acc)}
+.closex{float:right;background:none;border:none;color:var(--mut);font-size:24px;cursor:pointer;line-height:1}
+
+textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid var(--bdr);color:var(--txt);
+  border-radius:8px;padding:10px;font-family:monospace;font-size:11px;resize:vertical}
+
+/* aide */
+.aide h2{color:var(--acc);font-size:20px;margin:16px 0 6px}
+.aide p,.aide li{font-size:13px;line-height:1.5;color:var(--txt)}
+.aide .mut{color:var(--mut);font-size:12px}
+.rpe-t{width:100%;border-collapse:collapse;margin-top:6px}
+.rpe-t td{border-bottom:1px solid var(--bdr);padding:5px 6px;font-size:12px;vertical-align:top}
+.rpe-n{font-family:'Bebas Neue',sans-serif;font-size:16px;text-align:center;width:34px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--acc);color:#000;
+  padding:10px 18px;border-radius:20px;font-weight:700;font-size:13px;z-index:200;display:none}
+.foot{text-align:center;font-size:10px;color:var(--mut);margin-top:24px;letter-spacing:.5px}
+</style>
+</head>
+<body>
+<header>
+  <div class="htop">
+    <h1>LV<span>·</span>PLAN</h1>
+    <div class="obj">UT4M 180<br>Juil. 2027</div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" data-tab="cal">Calendrier</div>
+    <div class="tab" data-tab="aide">Aide / FAQ</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- CALENDRIER -->
+  <div class="view active" id="view-cal">
+    <div class="banner" id="banner">
+      <b>📋 Bilan du dimanche.</b> C'est le moment du point hebdo.
+      <div class="brow">
+        <button class="btn primary" onclick="weeklyExport()">Préparer le bilan</button>
+        <a class="btn" id="openClaude" href="#" target="_blank" rel="noopener">Ouvrir Claude</a>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="navbtn" onclick="moveMonth(-1)">‹</button>
+      <div class="month" id="monthLabel"></div>
+      <button class="navbtn" onclick="moveMonth(1)">›</button>
+    </div>
+    <div class="blocklabel" id="blockLabel"></div>
+
+    <div class="actions">
+      <button class="btn" onclick="goToday()">Aujourd'hui</button>
+      <button class="btn" onclick="weeklyExport()">📋 Bilan semaine</button>
+      <button class="btn" onclick="fullExport()">⬇ Export suivi</button>
+      <button class="btn" onclick="downloadICS()">🔔 Rappel agenda</button>
+    </div>
+
+    <div class="cal" id="dows"></div>
+    <div class="cal" id="grid" style="margin-top:4px"></div>
+
+    <div class="legend">
+      <span><i class="lg" style="background:var(--acc2)"></i>Longue</span>
+      <span><i class="lg" style="background:var(--acc)"></i>Côte / VAM</span>
+      <span><i class="lg" style="background:var(--grn)"></i>EF / récup</span>
+      <span><i class="lg" style="background:var(--blue)"></i>Renfo</span>
+      <span><i class="lg" style="background:var(--purp)"></i>Test</span>
+      <span><i class="lg" style="background:var(--bdr)"></i>Repos</span>
+    </div>
+    <div class="legend" style="margin-top:6px">
+      <span>⭕ à faire &nbsp; ⬤ fait (clique un jour pour cocher + noter RPE)</span>
+    </div>
+  </div>
+
+  <!-- AIDE -->
+  <div class="view aide" id="view-aide">
+    <h2>Comment ça marche</h2>
+    <p><b>3 canaux :</b> cet outil = ton plan + tu coches « fait » + log rapide. <b>Strava</b> = la donnée objective (allure, FC, D+, charge, VAM) que Claude va chercher lui-même. <b>Le chat</b> = Claude analyse et écrit le bloc suivant.</p>
+    <p><b>Après chaque séance :</b> coche « Fait », mets ton <b>RPE</b> + un ressenti. Pour les séances clés (longue, côte/test, course), ajoute une note. Astuce : mets aussi ton retour dans le <b>titre Strava</b> (RPE + ZP + 1 ressenti), Claude le lit.</p>
+    <p><b>Dimanche soir :</b> ton agenda sonne (rappel) → tu ouvres Claude → tu dis « check ma semaine ». Claude pulle Strava et te dit, honnête et intransigeant, si la suite du bloc tient.</p>
+    <p><b>Fin de bloc (~4 sem) :</b> bouton <b>Export suivi</b> → tu colles dans le chat → Claude croise avec Strava et génère le bloc suivant.</p>
+    <h2>Échelle RPE (effort perçu)</h2>
+    <p class="mut">Ressenti global de la séance, noté juste après.</p>
+    <table class="rpe-t" id="rpeTable"></table>
+    <p class="mut" style="margin-top:8px">Dans ton plan : EF / longue = 3-4 · côte hebdo = 7-8 · test VAM = 8 · récup = 1-2. Une séance « facile » qui sort à 6+ = signal de fatigue, note-le.</p>
+    <h2>Qui fait quoi</h2>
+    <p><b>Toi</b> : tu cours · tu coches · titre Strava (RPE/ressenti/ZP) · tu valides · tu signales tout imprévu.<br>
+    <b>Claude</b> : va chercher les chiffres · analyse · écrit le plan · te dit franchement si un choix bride la progression.</p>
+  </div>
+
+  <div class="foot">LV Tools · Plan d'entraînement · Données locales (localStorage) · Aucune pub</div>
+</div>
+
+<!-- DAY SHEET -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet" id="sheet"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var PROJECT="https://claude.ai/project/019e44b6-69df-7071-b20d-ee7deda6a581";
+var QPROMPT=encodeURIComponent("On est dimanche — fais le bilan de ma semaine d'entrainement a partir de Strava (volume, D+, ACWR, VAM, regularite). Sois honnete et intransigeant et dis-moi si la suite du bloc tient.");
+var CLAUDE_LINK=PROJECT+"?q="+QPROMPT;
+
+var TYPE_LABEL={longue:"Longue",cote:"Côte / VAM",ef:"EF",renfo:"Renfo",test:"Test VAM",repos:"Repos"};
+var MONTHS=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+var DOWS=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+
+var BLOCKS=[
+ {from:"2026-06-15",to:"2026-07-05",name:"Bloc R — Récupération post-St-Jacques"},
+ {from:"2026-07-06",to:"2026-08-02",name:"Bloc 1 — Réathlé + correction VAM"}
+];
+
+var PLAN={
+"2026-06-15":[{t:"repos",ti:"Repos complet",d:"Récup post-100K. Marche 20-30min si envie, mobilité douce.",rpe:"—"}],
+"2026-06-16":[{t:"repos",ti:"Repos",d:"Sommeil, hydratation, alimentation anti-inflammatoire.",rpe:"—"}],
+"2026-06-17":[{t:"repos",ti:"Repos / mobilité 15min",d:"Mobilité, étirements légers. Pas de course.",rpe:"—"}],
+"2026-06-18":[{t:"ef",ti:"Footing test 20-25min (optionnel)",d:"Très facile, UNIQUEMENT si les jambes sont OK. Sinon repos.",rpe:"2"}],
+"2026-06-19":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
+"2026-06-20":[{t:"repos",ti:"Marche / mobilité",d:"Activité très légère.",rpe:"—"}],
+"2026-06-21":[{t:"ef",ti:"Footing 25-30min (optionnel)",d:"Très facile, plat. Reprise en douceur.",rpe:"2-3"}],
+"2026-06-22":[{t:"ef",ti:"Footing 35min EF",d:"Très facile, plat.",rpe:"3"}],
+"2026-06-23":[{t:"repos",ti:"Repos / mobilité",d:"",rpe:"—"}],
+"2026-06-24":[{t:"ef",ti:"Footing 40min EF",d:"Plat, conversation fluide.",rpe:"3"},{t:"renfo",ti:"Renfo léger 30min",d:"Mobilité + gainage doux, pas de charge lourde.",rpe:"—"}],
+"2026-06-25":[{t:"ef",ti:"Footing 40min EF (12-14h)",d:"EF tranquille.",rpe:"3"}],
+"2026-06-26":[{t:"ef",ti:"Footing 30min cool (pote)",d:"Très facile, ou repos si fatigue.",rpe:"3"}],
+"2026-06-27":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
+"2026-06-28":[{t:"ef",ti:"Footing 40-45min EF (optionnel)",d:"EF.",rpe:"3"}],
+"2026-06-29":[{t:"longue",ti:"Sortie 1h EF vallonné léger",d:"Reprise du vallon, allure facile. Dont club si possible.",rpe:"3-4"}],
+"2026-06-30":[{t:"ef",ti:"Footing 45min + 4 lignes",d:"EF + 4x~80m en accélération souple. PAS encore de côte dure.",rpe:"4"}],
+"2026-07-01":[{t:"ef",ti:"50min EF",d:"",rpe:"3"},{t:"renfo",ti:"Renfo full-body léger 45min",d:"Réintro progressive.",rpe:"—"}],
+"2026-07-02":[{t:"ef",ti:"50min EF (12-14h)",d:"",rpe:"3"}],
+"2026-07-03":[{t:"ef",ti:"45min EF (pote)",d:"",rpe:"3"}],
+"2026-07-04":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
+"2026-07-05":[{t:"ef",ti:"45min EF (optionnel)",d:"Fin Bloc R. Si jambes bien, on enchaîne le Bloc 1.",rpe:"3"}],
+"2026-07-06":[{t:"longue",ti:"Sortie longue 1h30",d:"EF vallonné, dont ~1h avec le club. Allure conversation.",rpe:"3-4"}],
+"2026-07-07":[{t:"cote",ti:"Côte club — 8x20s souple",d:"Réintro côte. 8x20s en accélération souple, récup descente en marche. Pas dans le rouge.",rpe:"6-7"}],
+"2026-07-08":[{t:"ef",ti:"45min récup",d:"Z1-2, vraiment facile.",rpe:"2-3"},{t:"renfo",ti:"Renfo full-body 45min",d:"",rpe:"—"}],
+"2026-07-09":[{t:"ef",ti:"1h EF (12-14h)",d:"",rpe:"3"}],
+"2026-07-10":[{t:"ef",ti:"45-60min EF (pote)",d:"",rpe:"3"}],
+"2026-07-11":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
+"2026-07-12":[{t:"repos",ti:"Repos (ou 30min léger)",d:"",rpe:"—"}],
+"2026-07-13":[{t:"longue",ti:"Sortie longue 1h45",d:"EF + D+ léger. Dont club.",rpe:"3-4"}],
+"2026-07-14":[{t:"cote",ti:"Côte club — 6x45s",d:"6x45s à allure soutenue maîtrisée, récup descente. RPE 7.",rpe:"7"}],
+"2026-07-15":[{t:"ef",ti:"50min EF",d:"",rpe:"3"},{t:"renfo",ti:"Renfo full-body 45min",d:"",rpe:"—"}],
+"2026-07-16":[{t:"ef",ti:"1h EF (12-14h)",d:"Sur jambes de la côte de la veille.",rpe:"3"}],
+"2026-07-17":[{t:"ef",ti:"1h EF (pote)",d:"",rpe:"3"},{t:"renfo",ti:"Renfo full-body 45min",d:"",rpe:"—"}],
+"2026-07-18":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
+"2026-07-19":[{t:"repos",ti:"Repos (ou 30-40min léger)",d:"",rpe:"—"}],
+"2026-07-20":[{t:"longue",ti:"Sortie longue 2h",d:"EF vallonné. 1-2h solo puis ~1h EF club.",rpe:"3-4"}],
+"2026-07-21":[{t:"cote",ti:"Côte club — 8x45s (ou 5x1min30)",d:"RPE 7-8, récup descente. Garde de la marge, on construit.",rpe:"7-8"}],
+"2026-07-22":[{t:"ef",ti:"1h EF + 4 lignes",d:"",rpe:"3-4"},{t:"renfo",ti:"Renfo full-body 45min",d:"",rpe:"—"}],
+"2026-07-23":[{t:"ef",ti:"1h EF + 5x100m",d:"5 strides en fin de footing.",rpe:"3-4"}],
+"2026-07-24":[{t:"ef",ti:"1h EF (pote)",d:"",rpe:"3"},{t:"renfo",ti:"Renfo full-body 45min",d:"",rpe:"—"}],
+"2026-07-25":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
+"2026-07-26":[{t:"repos",ti:"Repos (ou 30-40min léger)",d:"",rpe:"—"}],
+"2026-07-27":[{t:"ef",ti:"1h15 EF souple",d:"Semaine allégée. Facile.",rpe:"3"}],
+"2026-07-28":[{t:"test",ti:"TEST VAM — 3x3min côte réf.",d:"Sur la côte de référence, 3x3min à intensité côte stable. Note FC moyenne + D+ (baseline 976 m/h @152 bpm). Récup descente complète.",rpe:"8"}],
+"2026-07-29":[{t:"ef",ti:"40min récup",d:"",rpe:"2-3"},{t:"renfo",ti:"Renfo léger 45min",d:"",rpe:"—"}],
+"2026-07-30":[{t:"ef",ti:"50min EF",d:"",rpe:"3"}],
+"2026-07-31":[{t:"repos",ti:"Repos (ou 40min light)",d:"",rpe:"—"}],
+"2026-08-01":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
+"2026-08-02":[{t:"repos",ti:"Repos — fin de bloc",d:"Clique « Export suivi », colle dans le Project : on déroule le Bloc 1 (S5-S10) ou on ajuste.",rpe:"—"}]
+};
+
+var RPE=[["1-2","Très facile","Récup, marche, footing décrassage. Tu chantes."],
+["3","Facile (EF)","Endurance fondamentale. Conversation fluide. La base du volume."],
+["4","Modéré confort","EF haute / longue facile. Tu parles par phrases."],
+["5","Modéré","Endurance soutenue. Phrases courtes."],
+["6","Un peu dur","Tempo bas / seuil aérobie. Parler devient gênant."],
+["7","Dur","Seuil. Côte / VAM : cœur de la qualité."],
+["8","Très dur","Intervalles, VMA longue, test VAM."],
+["9","Très très dur","VMA courte, quasi maximal."],
+["10","Maximal","Sprint. Ne peut pas tenir longtemps."]];
+
+var STORE="lvplan:log:v1";
+function loadLog(){try{return JSON.parse(localStorage.getItem(STORE)||"{}")}catch(e){return {}}}
+function saveLog(l){try{localStorage.setItem(STORE,JSON.stringify(l))}catch(e){}}
+var LOG=loadLog();
+
+function pad(n){return (n<10?"0":"")+n}
+function iso(y,m,d){return y+"-"+pad(m+1)+"-"+pad(d)}
+function parseISO(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2])}
+
+var today=new Date(); today.setHours(0,0,0,0);
+var TODAY_ISO=iso(today.getFullYear(),today.getMonth(),today.getDate());
+// vue par défaut : mois du 1er jour planifié
+var firstKey=Object.keys(PLAN).sort()[0];
+var fd=parseISO(firstKey);
+var viewY=fd.getFullYear(), viewM=fd.getMonth();
+
+function blockFor(dk){for(var i=0;i<BLOCKS.length;i++){if(dk>=BLOCKS[i].from&&dk<=BLOCKS[i].to)return BLOCKS[i].name}return ""}
+
+function renderDows(){var h="";for(var i=0;i<7;i++)h+='<div class="dow">'+DOWS[i]+'</div>';document.getElementById("dows").innerHTML=h}
+
+function renderCal(){
+  document.getElementById("monthLabel").textContent=MONTHS[viewM]+" "+viewY;
+  // block label : si le mois contient des dates planifiées
+  var first=new Date(viewY,viewM,1);
+  var startDow=(first.getDay()+6)%7; // lundi=0
+  var daysIn=new Date(viewY,viewM+1,0).getDate();
+  var html=""; var i;
+  for(i=0;i<startDow;i++) html+='<div class="cell empty"></div>';
+  var blk="";
+  for(var d=1;d<=daysIn;d++){
+    var dk=iso(viewY,viewM,d);
+    var sess=PLAN[dk];
+    var cls="cell"+(dk===TODAY_ISO?" today":"");
+    var dots="",allDone=false;
+    if(sess){
+      if(!blk) blk=blockFor(dk);
+      var doneCount=0, real=0;
+      for(var s=0;s<sess.length;s++){
+        var key=dk+"#"+s; var lg=LOG[key]||{};
+        var isDone=!!lg.done;
+        if(sess[s].t!=="repos"){real++; if(isDone)doneCount++;}
+        dots+='<span class="dot t-'+sess[s].t+(isDone?' done':'')+'"></span>';
+      }
+      allDone=(real>0 && doneCount===real);
+    }
+    html+='<div class="'+cls+'" '+(sess?'onclick="openDay(\''+dk+'\')"':'')+'>'
+      +'<div class="dn">'+d+'</div>'
+      +(allDone?'<div class="alldone">✓</div>':'')
+      +'<div class="dots">'+dots+'</div></div>';
+  }
+  document.getElementById("grid").innerHTML=html;
+  document.getElementById("blockLabel").textContent=blk||"";
+}
+
+function openDay(dk){
+  var sess=PLAN[dk]; if(!sess)return;
+  var dt=parseISO(dk);
+  var head=DOWS[(dt.getDay()+6)%7]+" "+dt.getDate()+" "+MONTHS[dt.getMonth()].toLowerCase();
+  var h='<button class="closex" onclick="closeSheet()">×</button>';
+  h+='<h3>'+head+'</h3><div class="sub">'+(blockFor(dk)||"")+'</div>';
+  for(var s=0;s<sess.length;s++){
+    var x=sess[s]; var key=dk+"#"+s; var lg=LOG[key]||{};
+    h+='<div class="sess t-'+x.t+'">';
+    h+='<div class="stitle">'+x.ti+'</div>';
+    if(x.d) h+='<div class="sdet">'+x.d+'</div>';
+    if(x.rpe&&x.rpe!=="—") h+='<div class="srpe">RPE cible : '+x.rpe+'</div>';
+    if(x.t!=="repos"){
+      h+='<div class="ctrl">';
+      h+='<button class="donebtn'+(lg.done?' on':'')+'" onclick="toggleDone(\''+key+'\',this)">'+(lg.done?'✓ Fait':'Marquer fait')+'</button>';
+      h+='<select onchange="setField(\''+key+'\',\'rpe\',this.value)"><option value="">RPE…</option>';
+      for(var r=1;r<=10;r++) h+='<option value="'+r+'"'+(String(lg.rpe)===String(r)?' selected':'')+'>'+r+'</option>';
+      h+='</select>';
+      h+='<div class="fb">';
+      var fbs=[["1","👍"],["2","😐"],["3","👎"]];
+      for(var f=0;f<3;f++) h+='<button class="fbb'+(String(lg.fb)===fbs[f][0]?' on':'')+'" onclick="setFb(\''+key+'\',\''+fbs[f][0]+'\',this)">'+fbs[f][1]+'</button>';
+      h+='</div>';
+      h+='<input class="note" placeholder="note (jambes, ZP, nutri…)" value="'+(lg.note||"").replace(/"/g,"&quot;")+'" onchange="setField(\''+key+'\',\'note\',this.value)">';
+      h+='</div>';
+    }
+    h+='</div>';
+  }
+  document.getElementById("sheet").innerHTML=h;
+  document.getElementById("overlay").classList.add("show");
+}
+function closeSheet(){document.getElementById("overlay").classList.remove("show");renderCal()}
+function ensure(key){if(!LOG[key])LOG[key]={};}
+function toggleDone(key,btn){ensure(key);LOG[key].done=!LOG[key].done;saveLog(LOG);
+  btn.classList.toggle("on",LOG[key].done);btn.textContent=LOG[key].done?"✓ Fait":"Marquer fait";}
+function setField(key,f,v){ensure(key);LOG[key][f]=v;saveLog(LOG);}
+function setFb(key,v,btn){ensure(key);LOG[key].fb=v;saveLog(LOG);
+  var sib=btn.parentNode.children;for(var i=0;i<sib.length;i++)sib[i].classList.remove("on");btn.classList.add("on");}
+
+function moveMonth(n){viewM+=n;if(viewM<0){viewM=11;viewY--}if(viewM>11){viewM=0;viewY++}renderCal()}
+function goToday(){viewY=today.getFullYear();viewM=today.getMonth();renderCal()}
+
+/* ---- exports ---- */
+var FB_TXT={"1":"👍 ok","2":"😐 moyen","3":"👎 dur"};
+function lineFor(dk){
+  var sess=PLAN[dk]; if(!sess)return null;
+  var dt=parseISO(dk); var lbl=DOWS[(dt.getDay()+6)%7]+" "+pad(dt.getDate())+"/"+pad(dt.getMonth()+1);
+  var parts=[];
+  for(var s=0;s<sess.length;s++){
+    var x=sess[s]; if(x.t==="repos")continue;
+    var lg=LOG[dk+"#"+s]||{};
+    var st=lg.done?"FAIT":"non fait";
+    var extra=[];
+    if(lg.rpe)extra.push("RPE"+lg.rpe);
+    if(lg.fb)extra.push(FB_TXT[lg.fb]);
+    if(lg.note)extra.push('"'+lg.note+'"');
+    parts.push(x.ti+" : "+st+(extra.length?" ("+extra.join(", ")+")":""));
+  }
+  if(!parts.length)return null;
+  return lbl+" — "+parts.join(" | ");
+}
+function rangeExport(from,to,title){
+  var out=[title,""]; var d=parseISO(from); var end=parseISO(to);
+  while(d<=end){var dk=iso(d.getFullYear(),d.getMonth(),d.getDate());var ln=lineFor(dk);if(ln)out.push(ln);d.setDate(d.getDate()+1);}
+  out.push(""); out.push("(Strava : Claude récupère volume/D+/FC/VAM/ACWR de son côté.)");
+  return out.join("\n");
+}
+function showExport(txt){
+  var h='<button class="closex" onclick="closeSheet()">×</button>';
+  h+='<h3>Export</h3><div class="sub">Copie et colle dans Claude, puis dis « on déroule la suite ».</div>';
+  h+='<textarea class="exp" id="expArea" readonly>'+txt.replace(/</g,"&lt;")+'</textarea>';
+  h+='<div class="ctrl" style="margin-top:10px">';
+  h+='<button class="donebtn on" onclick="copyExp()">Copier</button>';
+  h+='<a class="btn" style="flex:0;min-width:120px" href="'+CLAUDE_LINK+'" target="_blank" rel="noopener">Ouvrir Claude</a>';
+  h+='</div>';
+  document.getElementById("sheet").innerHTML=h;
+  document.getElementById("overlay").classList.add("show");
+}
+function copyExp(){var a=document.getElementById("expArea");a.select();
+  try{navigator.clipboard.writeText(a.value)}catch(e){document.execCommand("copy")}toast("Copié ✓");}
+function weeklyExport(){
+  // semaine (lundi->dimanche) contenant aujourd'hui
+  var d=new Date(today); var off=(d.getDay()+6)%7; d.setDate(d.getDate()-off);
+  var mon=iso(d.getFullYear(),d.getMonth(),d.getDate());
+  var e=new Date(d); e.setDate(e.getDate()+6);
+  var sun=iso(e.getFullYear(),e.getMonth(),e.getDate());
+  showExport(rangeExport(mon,sun,"BILAN SEMAINE "+mon+" → "+sun));
+}
+function fullExport(){
+  var ks=Object.keys(PLAN).sort();
+  showExport(rangeExport(ks[0],ks[ks.length-1],"EXPORT SUIVI — Bloc R + Bloc 1"));
+}
+
+/* ---- ICS ---- */
+function icsEsc(s){return s.replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n")}
+function downloadICS(){
+  var desc="Ouvre Claude (Project LV Tools) et tape: check ma semaine. "+
+           "Claude pulle Strava et fait le bilan honnete. Lien: "+CLAUDE_LINK;
+  var lines=[
+    "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//LV Tools//Plan//FR","CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT","UID:lvplan-bilan-dimanche@lvtools","DTSTAMP:20260609T120000Z",
+    "DTSTART:20260621T200000",
+    "DURATION:PT20M","RRULE:FREQ=WEEKLY;BYDAY=SU",
+    "SUMMARY:Bilan Strava avec Claude",
+    "DESCRIPTION:"+icsEsc(desc),
+    "URL:"+CLAUDE_LINK,
+    "BEGIN:VALARM","TRIGGER:PT0M","ACTION:DISPLAY","DESCRIPTION:Bilan Strava avec Claude","END:VALARM",
+    "END:VEVENT","END:VCALENDAR"
+  ];
+  var blob=new Blob([lines.join("\r\n")],{type:"text/calendar"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");a.href=url;a.download="rappel_bilan_dimanche.ics";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url)},2000);
+  toast("Rappel .ics téléchargé");
+}
+
+/* ---- toast / tabs / banner ---- */
+var tT;
+function toast(m){var t=document.getElementById("toast");t.textContent=m;t.style.display="block";
+  clearTimeout(tT);tT=setTimeout(function(){t.style.display="none"},1800);}
+function setTab(name){
+  var tabs=document.querySelectorAll(".tab");for(var i=0;i<tabs.length;i++)tabs[i].classList.toggle("active",tabs[i].getAttribute("data-tab")===name);
+  document.getElementById("view-cal").classList.toggle("active",name==="cal");
+  document.getElementById("view-aide").classList.toggle("active",name==="aide");
+}
+document.querySelectorAll(".tab").forEach(function(t){t.onclick=function(){setTab(t.getAttribute("data-tab"))}});
+
+function renderRPE(){var h="";for(var i=0;i<RPE.length;i++)h+='<tr><td class="rpe-n">'+RPE[i][0]+'</td><td><b>'+RPE[i][1]+'</b><br><span class="mut">'+RPE[i][2]+'</span></td></tr>';document.getElementById("rpeTable").innerHTML=h;}
+
+function initBanner(){
+  document.getElementById("openClaude").href=CLAUDE_LINK;
+  if(today.getDay()===0) document.getElementById("banner").classList.add("show");
+}
+
+renderDows();renderCal();renderRPE();initBanner();
+</script>
+</body>
+</html>
