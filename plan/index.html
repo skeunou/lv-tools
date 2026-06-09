@@ -103,6 +103,10 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
 .rpe-t{width:100%;border-collapse:collapse;margin-top:6px}
 .rpe-t td{border-bottom:1px solid var(--bdr);padding:5px 6px;font-size:12px;vertical-align:top}
 .rpe-n{font-family:'Bebas Neue',sans-serif;font-size:16px;text-align:center;width:34px}
+.garmin{background:var(--surf2);border:1px dashed var(--blue);border-radius:8px;padding:8px 10px;margin:8px 0}
+.garmin .glab{font-size:10px;color:var(--blue);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.garmin .gval{font-size:12px;color:var(--txt);line-height:1.45}
+.gcopy{margin-top:6px;background:var(--blue);color:#000;border:none;border-radius:6px;padding:5px 11px;font-size:11px;font-weight:700;cursor:pointer}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--acc);color:#000;
   padding:10px 18px;border-radius:20px;font-weight:700;font-size:13px;z-index:200;display:none}
 .foot{text-align:center;font-size:10px;color:var(--mut);margin-top:24px;letter-spacing:.5px}
@@ -166,6 +170,7 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
     <h2>Comment ça marche</h2>
     <p><b>3 canaux :</b> cet outil = ton plan + tu coches « fait » + log rapide. <b>Strava</b> = la donnée objective (allure, FC, D+, charge, VAM) que Claude va chercher lui-même. <b>Le chat</b> = Claude analyse et écrit le bloc suivant.</p>
     <p><b>Après chaque séance :</b> coche « Fait », mets ton <b>RPE</b> + un ressenti. Pour les séances clés (longue, côte/test, course), ajoute une note. Astuce : mets aussi ton retour dans le <b>titre Strava</b> (RPE + ZP + 1 ressenti), Claude le lit.</p>
+    <p><b>Si tu changes la séance</b> (ex : 1h EF au lieu de 40min prescrites), note-le dans le champ <b>« Réalisé »</b> — laisse vide = fait comme prévu. Ça affine l'analyse. Sur les séances structurées (côte, test), le bloc <b>⌚ Structure Garmin</b> se copie dans Garmin Connect ou intervals.icu.</p>
     <p><b>Dimanche soir :</b> ton agenda sonne (rappel) → tu ouvres Claude → tu dis « check ma semaine ». Claude pulle Strava et te dit, honnête et intransigeant, si la suite du bloc tient.</p>
     <p><b>Fin de bloc (~4 sem) :</b> bouton <b>Export suivi</b> → tu colles dans le chat → Claude croise avec Strava et génère le bloc suivant.</p>
     <h2>Échelle RPE (effort perçu)</h2>
@@ -215,36 +220,36 @@ var PLAN={
 "2026-06-26":[{t:"ef",ti:"Footing 30min cool (pote)",d:"Très facile, ou repos si fatigue.",rpe:"3"}],
 "2026-06-27":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
 "2026-06-28":[{t:"ef",ti:"Footing 40-45min EF (optionnel)",d:"EF.",rpe:"3"}],
-"2026-06-29":[{t:"longue",ti:"Sortie 1h EF vallonné léger",d:"Reprise du vallon, allure facile. Dont club si possible.",rpe:"3-4"}],
+"2026-06-29":[{t:"longue",ti:"Sortie 1h — club EF",d:"1h EF avec les copains (lundi midi = toujours 1h EF, social). Reprise du vallon, allure facile.",rpe:"3-4"}],
 "2026-06-30":[{t:"ef",ti:"Footing 45min + 4 lignes",d:"EF + 4x~80m en accélération souple. PAS encore de côte dure.",rpe:"4"}],
 "2026-07-01":[{t:"ef",ti:"50min EF",d:"",rpe:"3"},{t:"renfo",ti:"Renfo full-body léger 45min",d:"Réintro progressive.",rpe:"—"}],
 "2026-07-02":[{t:"ef",ti:"50min EF (12-14h)",d:"",rpe:"3"}],
 "2026-07-03":[{t:"ef",ti:"45min EF (pote)",d:"",rpe:"3"}],
 "2026-07-04":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
 "2026-07-05":[{t:"ef",ti:"45min EF (optionnel)",d:"Fin Bloc R. Si jambes bien, on enchaîne le Bloc 1.",rpe:"3"}],
-"2026-07-06":[{t:"longue",ti:"Sortie longue 1h30",d:"EF vallonné, dont ~1h avec le club. Allure conversation.",rpe:"3-4"}],
-"2026-07-07":[{t:"cote",ti:"Côte club — 8x20s souple",d:"Réintro côte. 8x20s en accélération souple, récup descente en marche. Pas dans le rouge.",rpe:"6-7"}],
+"2026-07-06":[{t:"longue",ti:"Sortie longue ~1h30",d:"~30min solo vallonné EF + 1h EF club (lundi midi = toujours 1h EF avec les copains). Allure conversation.",rpe:"3-4"}],
+"2026-07-07":[{t:"cote",ti:"Côte club — 8x20s souple",d:"Réintro côte. 8x20s en accélération souple, récup descente en marche. Pas dans le rouge.",rpe:"6-7",g:"Échauf 15min EF · 8× (20s accélération souple / récup descente marche) · Retour 10min EF"}],
 "2026-07-08":[{t:"ef",ti:"45min récup",d:"Z1-2, vraiment facile.",rpe:"2-3"},{t:"renfo",ti:"Renfo full-body 45min",d:"",rpe:"—"}],
 "2026-07-09":[{t:"ef",ti:"1h EF (12-14h)",d:"",rpe:"3"}],
 "2026-07-10":[{t:"ef",ti:"45-60min EF (pote)",d:"",rpe:"3"}],
 "2026-07-11":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
 "2026-07-12":[{t:"repos",ti:"Repos (ou 30min léger)",d:"",rpe:"—"}],
-"2026-07-13":[{t:"longue",ti:"Sortie longue 1h45",d:"EF + D+ léger. Dont club.",rpe:"3-4"}],
-"2026-07-14":[{t:"cote",ti:"Côte club — 6x45s",d:"6x45s à allure soutenue maîtrisée, récup descente. RPE 7.",rpe:"7"}],
+"2026-07-13":[{t:"longue",ti:"Sortie longue ~1h45",d:"~45min solo (D+ léger) + 1h EF club fixe. Allure conversation.",rpe:"3-4"}],
+"2026-07-14":[{t:"cote",ti:"Côte club — 6x45s",d:"6x45s à allure soutenue maîtrisée, récup descente. RPE 7.",rpe:"7",g:"Échauf 15min EF · 6× (45s soutenu maîtrisé / 90s récup descente) · Retour 10min EF"}],
 "2026-07-15":[{t:"ef",ti:"50min EF",d:"",rpe:"3"},{t:"renfo",ti:"Renfo full-body 45min",d:"",rpe:"—"}],
 "2026-07-16":[{t:"ef",ti:"1h EF (12-14h)",d:"Sur jambes de la côte de la veille.",rpe:"3"}],
 "2026-07-17":[{t:"ef",ti:"1h EF (pote)",d:"",rpe:"3"},{t:"renfo",ti:"Renfo full-body 45min",d:"",rpe:"—"}],
 "2026-07-18":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
 "2026-07-19":[{t:"repos",ti:"Repos (ou 30-40min léger)",d:"",rpe:"—"}],
-"2026-07-20":[{t:"longue",ti:"Sortie longue 2h",d:"EF vallonné. 1-2h solo puis ~1h EF club.",rpe:"3-4"}],
-"2026-07-21":[{t:"cote",ti:"Côte club — 8x45s (ou 5x1min30)",d:"RPE 7-8, récup descente. Garde de la marge, on construit.",rpe:"7-8"}],
+"2026-07-20":[{t:"longue",ti:"Sortie longue ~2h",d:"~1h solo vallonné + 1h EF club fixe. Allure conversation.",rpe:"3-4"}],
+"2026-07-21":[{t:"cote",ti:"Côte club — 8x45s (ou 5x1min30)",d:"RPE 7-8, récup descente. Garde de la marge, on construit.",rpe:"7-8",g:"Échauf 15min EF · 8× (45s RPE 7-8 / 90s récup descente) · Retour 10min EF"}],
 "2026-07-22":[{t:"ef",ti:"1h EF + 4 lignes",d:"",rpe:"3-4"},{t:"renfo",ti:"Renfo full-body 45min",d:"",rpe:"—"}],
 "2026-07-23":[{t:"ef",ti:"1h EF + 5x100m",d:"5 strides en fin de footing.",rpe:"3-4"}],
 "2026-07-24":[{t:"ef",ti:"1h EF (pote)",d:"",rpe:"3"},{t:"renfo",ti:"Renfo full-body 45min",d:"",rpe:"—"}],
 "2026-07-25":[{t:"repos",ti:"Repos",d:"",rpe:"—"}],
 "2026-07-26":[{t:"repos",ti:"Repos (ou 30-40min léger)",d:"",rpe:"—"}],
-"2026-07-27":[{t:"ef",ti:"1h15 EF souple",d:"Semaine allégée. Facile.",rpe:"3"}],
-"2026-07-28":[{t:"test",ti:"TEST VAM — 3x3min côte réf.",d:"Sur la côte de référence, 3x3min à intensité côte stable. Note FC moyenne + D+ (baseline 976 m/h @152 bpm). Récup descente complète.",rpe:"8"}],
+"2026-07-27":[{t:"longue",ti:"Sortie ~1h15 souple",d:"Semaine allégée : 1h EF club fixe + ~15min. Facile.",rpe:"3"}],
+"2026-07-28":[{t:"test",ti:"TEST VAM — 3x3min côte réf.",d:"Sur la côte de référence, 3x3min à intensité côte stable. Note FC moyenne + D+ (baseline 976 m/h @152 bpm). Récup descente complète.",rpe:"8",g:"Échauf 20min progressif · 3× (3min effort côte stable — noter FC+D+ / récup descente complète ~3min) · Retour 10min EF"}],
 "2026-07-29":[{t:"ef",ti:"40min récup",d:"",rpe:"2-3"},{t:"renfo",ti:"Renfo léger 45min",d:"",rpe:"—"}],
 "2026-07-30":[{t:"ef",ti:"50min EF",d:"",rpe:"3"}],
 "2026-07-31":[{t:"repos",ti:"Repos (ou 40min light)",d:"",rpe:"—"}],
@@ -328,6 +333,7 @@ function openDay(dk){
     h+='<div class="stitle">'+x.ti+'</div>';
     if(x.d) h+='<div class="sdet">'+x.d+'</div>';
     if(x.rpe&&x.rpe!=="—") h+='<div class="srpe">RPE cible : '+x.rpe+'</div>';
+    if(x.g) h+='<div class="garmin"><div class="glab">⌚ Structure Garmin / intervals.icu</div><div class="gval">'+x.g+'</div><button class="gcopy" onclick="copyText(this)">Copier</button></div>';
     if(x.t!=="repos"){
       h+='<div class="ctrl">';
       h+='<button class="donebtn'+(lg.done?' on':'')+'" onclick="toggleDone(\''+key+'\',this)">'+(lg.done?'✓ Fait':'Marquer fait')+'</button>';
@@ -338,6 +344,7 @@ function openDay(dk){
       var fbs=[["1","👍"],["2","😐"],["3","👎"]];
       for(var f=0;f<3;f++) h+='<button class="fbb'+(String(lg.fb)===fbs[f][0]?' on':'')+'" onclick="setFb(\''+key+'\',\''+fbs[f][0]+'\',this)">'+fbs[f][1]+'</button>';
       h+='</div>';
+      h+='<input class="note" placeholder="Réalisé si différent du prévu (ex: 1h EF au lieu de 40min)" value="'+(lg.real||"").replace(/"/g,"&quot;")+'" onchange="setField(\''+key+'\',\'real\',this.value)">';
       h+='<input class="note" placeholder="note (jambes, ZP, nutri…)" value="'+(lg.note||"").replace(/"/g,"&quot;")+'" onchange="setField(\''+key+'\',\'note\',this.value)">';
       h+='</div>';
     }
@@ -368,6 +375,7 @@ function lineFor(dk){
     var lg=LOG[dk+"#"+s]||{};
     var st=lg.done?"FAIT":"non fait";
     var extra=[];
+    if(lg.real)extra.push("réalisé: "+lg.real);
     if(lg.rpe)extra.push("RPE"+lg.rpe);
     if(lg.fb)extra.push(FB_TXT[lg.fb]);
     if(lg.note)extra.push('"'+lg.note+'"');
@@ -379,7 +387,7 @@ function lineFor(dk){
 function rangeExport(from,to,title){
   var out=[title,""]; var d=parseISO(from); var end=parseISO(to);
   while(d<=end){var dk=iso(d.getFullYear(),d.getMonth(),d.getDate());var ln=lineFor(dk);if(ln)out.push(ln);d.setDate(d.getDate()+1);}
-  out.push(""); out.push("(Strava : Claude récupère volume/D+/FC/VAM/ACWR de son côté.)");
+  out.push(""); out.push("(Pas de 'réalisé' = séance faite comme prévu. Strava : Claude récupère volume/D+/FC/VAM/ACWR de son côté.)");
   return out.join("\n");
 }
 function showExport(txt){
@@ -395,6 +403,8 @@ function showExport(txt){
 }
 function copyExp(){var a=document.getElementById("expArea");a.select();
   try{navigator.clipboard.writeText(a.value)}catch(e){document.execCommand("copy")}toast("Copié ✓");}
+function copyText(btn){var v=btn.parentNode.querySelector('.gval').textContent;
+  try{navigator.clipboard.writeText(v)}catch(e){}toast("Structure copiée ✓");}
 function weeklyExport(){
   // semaine (lundi->dimanche) contenant aujourd'hui
   var d=new Date(today); var off=(d.getDay()+6)%7; d.setDate(d.getDate()-off);
