@@ -111,9 +111,45 @@
     font-size:10px;color:var(--mut);letter-spacing:1px;line-height:1.8
   }
   .hub-footer strong{color:var(--acc);font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:12px}
+
+  /* PASSWORD GATE */
+  #lvgate{position:fixed;inset:0;z-index:9999;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;padding:24px}
+  #lvgate.hidden{display:none}
+  .gate-card{width:100%;max-width:300px;text-align:center}
+  .gate-eyebrow{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;
+    color:var(--mut);text-transform:uppercase;margin-bottom:8px}
+  .gate-title{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;
+    line-height:1;color:var(--txt)}
+  .gate-title span{color:var(--acc)}
+  .gate-lock{font-size:30px;margin:18px 0 14px}
+  .gate-input{width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;
+    color:var(--txt);font-family:'DM Sans',sans-serif;font-size:22px;text-align:center;
+    letter-spacing:8px;padding:14px;outline:none}
+  .gate-input:focus{border-color:var(--acc)}
+  .gate-btn{width:100%;margin-top:12px;background:var(--acc);color:#000;border:none;border-radius:10px;
+    font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;padding:13px;cursor:pointer}
+  .gate-err{color:var(--acc2);font-size:12px;margin-top:10px;min-height:16px;letter-spacing:.5px}
+  .gate-shake{animation:gshake .35s}
+  @keyframes gshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  .lock-again{margin-top:16px;font-size:11px;color:var(--mut);background:none;border:none;
+    cursor:pointer;letter-spacing:.5px;text-decoration:underline;font-family:'DM Sans',sans-serif}
 </style>
 </head>
 <body>
+
+<div id="lvgate">
+  <div class="gate-card">
+    <div class="gate-eyebrow">Accès privé</div>
+    <div class="gate-title">LV<span>'s</span> TOOLS</div>
+    <div class="gate-lock">🔒</div>
+    <input id="gatePw" class="gate-input" type="password" inputmode="numeric"
+           autocomplete="off" placeholder="••••" aria-label="Mot de passe">
+    <button id="gateBtn" class="gate-btn">Déverrouiller</button>
+    <div id="gateErr" class="gate-err"></div>
+  </div>
+</div>
+
 
 <div class="hub-header">
   <div class="hub-eyebrow">Tableau de bord personnel</div>
@@ -178,8 +214,45 @@
 
 <div class="hub-footer">
   <strong>LV's TOOLS</strong><br>
-  Construit sur mesure · Données locales · Aucune pub
+  Construit sur mesure · Données locales · Aucune pub<br>
+  <button class="lock-again" onclick="lvLock()">🔒 Verrouiller</button>
 </div>
 
+
+<script>
+(function(){
+  var HASH="f8a5da214f3f6c281e008924914e7decf9a13637737204589eed04379dc600a8";
+  var KEY="lvtools:unlocked";
+  var gate=document.getElementById('lvgate');
+  var inp=document.getElementById('gatePw');
+  var btn=document.getElementById('gateBtn');
+  var err=document.getElementById('gateErr');
+  var card=gate.querySelector('.gate-card');
+
+  function unlock(persist){ if(persist){ try{localStorage.setItem(KEY,'1');}catch(e){} } gate.classList.add('hidden'); }
+  function lock(){ try{localStorage.removeItem(KEY);}catch(e){} gate.classList.remove('hidden'); inp.value=''; setTimeout(function(){inp.focus();},50); }
+  window.lvLock=lock;
+
+  try{ if(localStorage.getItem(KEY)==='1'){ gate.classList.add('hidden'); } }catch(e){}
+
+  async function sha256(s){
+    var buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+  }
+  async function check(){
+    err.textContent='';
+    var h=await sha256((inp.value||'').trim());
+    if(h===HASH){ unlock(true); }
+    else{
+      err.textContent='Code incorrect';
+      card.classList.remove('gate-shake'); void card.offsetWidth; card.classList.add('gate-shake');
+      inp.value=''; inp.focus();
+    }
+  }
+  btn.addEventListener('click',check);
+  inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ check(); } });
+  if(!gate.classList.contains('hidden')){ setTimeout(function(){inp.focus();},100); }
+})();
+</script>
 </body>
 </html>
