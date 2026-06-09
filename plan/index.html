@@ -116,6 +116,15 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
 .gcopy{margin-top:6px;background:var(--blue);color:#000;border:none;border-radius:6px;padding:5px 11px;font-size:11px;font-weight:700;cursor:pointer}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--acc);color:#000;
   padding:10px 18px;border-radius:20px;font-weight:700;font-size:13px;z-index:200;display:none}
+.tgt{background:rgba(56,189,248,.10);border:1px solid var(--blue);border-radius:8px;padding:7px 10px;margin-top:8px;font-size:12px;color:var(--txt);line-height:1.4}
+.tgt.warn{background:rgba(255,149,0,.10);border-color:var(--warn);color:var(--warn)}
+.zin{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.zin label{font-size:13px;color:var(--mut)}
+.zin input{width:100px;background:var(--surf2);border:1px solid var(--bdr);color:var(--txt);border-radius:8px;padding:9px;font-size:15px;text-align:center;font-family:'DM Sans',sans-serif}
+.ztab{width:100%;border-collapse:collapse;margin-top:8px}
+.ztab th,.ztab td{border-bottom:1px solid var(--bdr);padding:6px 5px;font-size:11px;text-align:center}
+.ztab th{color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-size:9px}
+.ztab td.zl{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--acc)}
 .foot{text-align:center;font-size:10px;color:var(--mut);margin-top:24px;letter-spacing:.5px}
 </style>
 </head>
@@ -132,7 +141,8 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
   </div>
   <div class="tabs">
     <div class="tab active" data-tab="cal">Calendrier</div>
-    <div class="tab" data-tab="aide">Aide / FAQ</div>
+    <div class="tab" data-tab="zones">Zones</div>
+    <div class="tab" data-tab="aide">Aide</div>
   </div>
 </header>
 
@@ -176,6 +186,9 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
       <span>⭕ à faire &nbsp; ⬤ fait (clique un jour pour cocher + noter RPE)</span>
     </div>
   </div>
+
+  <!-- ZONES -->
+  <div class="view aide" id="view-zones"></div>
 
   <!-- AIDE -->
   <div class="view aide" id="view-aide">
@@ -369,6 +382,7 @@ function openDay(dk){
     h+='<div class="stitle">'+x.ti+'</div>';
     if(x.d) h+='<div class="sdet">'+x.d+'</div>';
     if(x.rpe&&x.rpe!=="—") h+='<div class="srpe">RPE cible : '+x.rpe+'</div>';
+    h+=targetHTML(x);
     if(x.g) h+='<div class="garmin"><div class="glab">⌚ Structure Garmin / intervals.icu</div><div class="gval">'+x.g+'</div><button class="gcopy" onclick="copyText(this)">Copier</button></div>';
     if(x.t!=="repos"){
       h+='<div class="ctrl">';
@@ -482,10 +496,57 @@ function downloadICS(){
 var tT;
 function toast(m){var t=document.getElementById("toast");t.textContent=m;t.style.display="block";
   clearTimeout(tT);tT=setTimeout(function(){t.style.display="none"},1800);}
+/* ---- ZONES ---- */
+var ZK="lvplan:zones:v1";
+var ZDEF={fcmax:175,hrrest:"",vma:16,vamref:970,validated:false};
+function loadZones(){try{var z=JSON.parse(localStorage.getItem(ZK));return z?z:Object.assign({},ZDEF)}catch(e){return Object.assign({},ZDEF)}}
+function saveZones(z){try{localStorage.setItem(ZK,JSON.stringify(z))}catch(e){}}
+var Z=loadZones();
+var BANDS={1:[0,.70,0,.65,0,.50],2:[.70,.80,.65,.75,.50,.65],3:[.80,.87,.75,.85,.65,.80],4:[.87,.92,.85,.92,.80,.92],5:[.92,1,.92,1.05,.92,1.02]};
+var ZOBJ={1:"Récup",2:"Endurance",3:"Tempo/Seuil aéro",4:"Seuil",5:"VMA"};
+function hrAt(p){var r=(Z.hrrest&&+Z.hrrest>0)?(+Z.hrrest+p*(Z.fcmax-(+Z.hrrest))):p*Z.fcmax;return Math.round(r);}
+function paceFromSpeed(kmh){if(kmh<=0)return"–";var m=60/kmh;var mm=Math.floor(m);var ss=Math.round((m-mm)*60);if(ss===60){mm++;ss=0;}return mm+":"+(ss<10?"0":"")+ss;}
+function zoneCalc(z){var b=BANDS[z];var vzmax=Math.round(Z.vamref/0.88);
+  var pace=(z===1)?("> "+paceFromSpeed(b[3]*Z.vma)):(paceFromSpeed(b[3]*Z.vma)+"–"+paceFromSpeed(b[2]*Z.vma));
+  return {fc:hrAt(b[0])+"–"+hrAt(b[1]),pace:pace,vz:Math.round(b[4]*vzmax)+"–"+Math.round(b[5]*vzmax)};}
+function zoneFor(x){if(x.t==="test")return 5;if(x.t==="cote")return 4;if(x.t==="longue")return 2;
+  if(x.t==="ef"){var s=(x.ti+" "+(x.d||"")).toLowerCase();return /r[eé]cup/.test(s)?1:2;}return null;}
+function targetHTML(x){var z=zoneFor(x);if(!z)return"";
+  if(!Z.validated)return '<div class="tgt warn">⚙️ Valide tes zones (onglet Zones) pour les cibles chiffrées.</div>';
+  var c=zoneCalc(z),inner;
+  if(x.t==="cote"||x.t==="test")inner="Vz Z"+z+" : <b>"+c.vz+" m/h</b> · FC "+c.fc;
+  else if(x.t==="longue")inner="FC Z"+z+" : <b>"+c.fc+"</b> · allure ignorée (RPE "+(x.rpe||"3-4")+")";
+  else inner="Allure Z"+z+" : <b>"+c.pace+"/km</b> · FC "+c.fc;
+  return '<div class="tgt">🎯 '+inner+'</div>';}
+function validateZones(){
+  Z.fcmax=+document.getElementById("zFcmax").value||Z.fcmax;
+  Z.hrrest=document.getElementById("zHrrest").value;
+  Z.vma=+document.getElementById("zVma").value||Z.vma;
+  Z.vamref=+document.getElementById("zVamref").value||Z.vamref;
+  Z.validated=true;saveZones(Z);renderZones();toast("Zones validées ✓");}
+function renderZones(){
+  var el=document.getElementById("view-zones");if(!el)return;
+  var h='<h2>Mes zones</h2>';
+  if(!Z.validated)h+='<div class="tgt warn" style="margin-bottom:10px">⚠️ Valeurs pré-remplies depuis Strava — <b>à vérifier/corriger puis valider</b>. Ce ne sont pas des mesures fiables.</div>';
+  h+='<div class="zin"><label>FC Max (bpm)</label><input id="zFcmax" type="number" value="'+Z.fcmax+'"></div>';
+  h+='<div class="zin"><label>FC repos (optionnel)</label><input id="zHrrest" type="number" value="'+(Z.hrrest||"")+'" placeholder="—"></div>';
+  h+='<div class="zin"><label>VMA (km/h)</label><input id="zVma" type="number" step="0.1" value="'+Z.vma+'"></div>';
+  h+='<div class="zin"><label>VAM réf. côte (m/h)</label><input id="zVamref" type="number" value="'+Z.vamref+'"></div>';
+  h+='<button class="btn primary" style="width:100%;margin:6px 0 12px" onclick="validateZones()">Valider / Recalculer</button>';
+  h+='<table class="ztab"><tr><th>Z</th><th>Objectif</th><th>FC</th><th>Allure/km</th><th>Vz côte</th></tr>';
+  for(var z=1;z<=5;z++){var c=zoneCalc(z);
+    h+='<tr><td class="zl">Z'+z+'</td><td style="text-align:left">'+ZOBJ[z]+'</td><td>'+c.fc+'</td><td>'+c.pace+'</td><td>'+c.vz+'</td></tr>';}
+  h+='</table>';
+  h+='<p class="mut" style="font-size:11px;margin-top:10px"><b>Pré-rempli :</b> FCmax = pic observé ~171 sur efforts sous-max (ta vraie max est sans doute ~175-180 — corrige si tu la connais). VMA ~16 estimée (un test l\'affinera). VAM côte = ta valeur mesurée ~970 m/h au seuil. FC calculée en % FCmax — renseigne la <b>FC repos</b> pour passer en % de FC de réserve (plus précis). <b>Vz ancrée sur ta VAM mesurée</b>, pas sur VMA×100. Cibles : allure sur plat · Vz en côte · FC sur le long.</p>';
+  el.innerHTML=h;
+}
+
 function setTab(name){
   var tabs=document.querySelectorAll(".tab");for(var i=0;i<tabs.length;i++)tabs[i].classList.toggle("active",tabs[i].getAttribute("data-tab")===name);
   document.getElementById("view-cal").classList.toggle("active",name==="cal");
+  document.getElementById("view-zones").classList.toggle("active",name==="zones");
   document.getElementById("view-aide").classList.toggle("active",name==="aide");
+  if(name==="zones")renderZones();
 }
 document.querySelectorAll(".tab").forEach(function(t){t.onclick=function(){setTab(t.getAttribute("data-tab"))}});
 
@@ -496,7 +557,7 @@ function initBanner(){
   if(today.getDay()===0) document.getElementById("banner").classList.add("show");
 }
 
-renderDows();renderCal();renderRPE();initBanner();renderNext();
+renderDows();renderCal();renderRPE();initBanner();renderNext();renderZones();
 </script>
 </body>
 </html>
