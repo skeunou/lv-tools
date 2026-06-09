@@ -17,8 +17,12 @@ body{margin:0;background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-s
 h1,h2,h3,.bebas{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;font-weight:400}
 header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:2px solid var(--acc);padding:10px 14px}
 .htop{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.htop h1{font-size:30px;margin:0;line-height:1}
+.htop h1{font-size:24px;margin:0;line-height:1}
 .htop h1 span{color:var(--acc)}
+.nextrace{text-align:center;line-height:1.05;flex:1;min-width:0;padding:0 6px}
+.nextrace .nlab{font-size:8px;color:var(--mut);letter-spacing:1.5px;text-transform:uppercase}
+.nextrace .njrs{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--acc);letter-spacing:1px;line-height:1}
+.nextrace .nnm{font-size:9px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .obj{font-size:11px;color:var(--mut);letter-spacing:.5px;text-transform:uppercase}
 .tabs{display:flex;gap:6px;margin-top:8px}
 .tab{flex:1;text-align:center;padding:8px;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;
@@ -116,6 +120,7 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
 <header>
   <div class="htop">
     <h1>LV<span>·</span>PLAN</h1>
+    <div class="nextrace" id="nextRace"></div>
     <div class="obj">UT4M 180<br>Juil. 2027</div>
   </div>
   <div class="tabs">
@@ -266,6 +271,27 @@ var RPE=[["1-2","Très facile","Récup, marche, footing décrassage. Tu chantes.
 ["8","Très dur","Intervalles, VMA longue, test VAM."],
 ["9","Très très dur","VMA courte, quasi maximal."],
 ["10","Maximal","Sprint. Ne peut pas tenir longtemps."]];
+
+var RACES=[
+ {d:"2026-06-13",n:"Saint-Jacques 100K"},
+ {d:"2026-10-11",n:"10K de Caluire"},
+ {d:"2026-12-13",n:"SaintSprint (duo)"},
+ {d:"2027-01-31",n:"25K Givré / Carbonne"},
+ {d:"2027-03-19",n:"Chianti UT 46K"},
+ {d:"2027-04-18",n:"Trail de Paladru 84K"},
+ {d:"2027-05-29",n:"Maxi-Race"},
+ {d:"2027-06-19",n:"L'Ardéchoise (vélo)"},
+ {d:"2027-07-15",n:"UT4M 180 Challenge"}
+];
+function renderNext(){
+  var el=document.getElementById("nextRace"); if(!el)return;
+  var next=null;
+  for(var i=0;i<RACES.length;i++){ if(RACES[i].d>=TODAY_ISO){next=RACES[i];break;} }
+  if(!next){el.innerHTML='<div class="nlab">Saison terminée 🎉</div>';return;}
+  var days=Math.round((parseISO(next.d)-today)/86400000);
+  var jr=days<=0?"Jour J":"J-"+days;
+  el.innerHTML='<div class="nlab">Prochaine</div><div class="njrs">'+jr+'</div><div class="nnm">'+next.n+'</div>';
+}
 
 var STORE="lvplan:log:v1";
 function loadLog(){try{return JSON.parse(localStorage.getItem(STORE)||"{}")}catch(e){return {}}}
@@ -460,7 +486,7 @@ function initBanner(){
   if(today.getDay()===0) document.getElementById("banner").classList.add("show");
 }
 
-renderDows();renderCal();renderRPE();initBanner();
+renderDows();renderCal();renderRPE();initBanner();renderNext();
 </script>
 </body>
 </html>
