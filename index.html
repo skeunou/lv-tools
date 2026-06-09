@@ -2,257 +2,79 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>LV's Tools</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LV TOOL — Mes Outils Sport</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0d0d0f;--surf:#141416;--surf2:#1c1c20;--bdr:#2a2a30;
-    --acc:#e8ff47;--acc2:#ff6b35;--warn:#ff9500;--txt:#f0f0f0;
-    --mut:#6b6b78;--grn:#4ade80;--purp:#a78bfa;--blue:#38bdf8;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  body{
-    background:var(--bg);color:var(--txt);
-    font-family:'DM Sans',system-ui,sans-serif;
-    min-height:100vh;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;padding:24px 20px;
-  }
+:root{--bg:#0d0d0f;--surf:#141416;--surf2:#1c1c20;--bdr:#2a2a30;--acc:#e8ff47;--acc2:#ff6b35;--warn:#ff9500;--txt:#f0f0f0;--mut:#6b6b78;--grn:#4ade80;--red:#f87171;--purp:#a78bfa;--blue:#38bdf8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+body{display:flex;flex-direction:column;align-items:center;padding:30px 20px 60px;background:radial-gradient(circle at 30% 0%,rgba(232,255,71,.06),transparent 50%),radial-gradient(circle at 80% 100%,rgba(255,107,53,.05),transparent 50%),var(--bg)}
+.back{align-self:flex-start;font-size:12px;color:var(--mut);text-decoration:none;letter-spacing:1px;margin-bottom:30px;padding:6px 10px;border-radius:6px;border:1px solid transparent;transition:.2s}
+.back:hover{color:var(--acc);border-color:var(--bdr)}
+header{text-align:center;margin:20px 0 50px;animation:fadeIn .6s ease}
+.hello{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,7vw,64px);letter-spacing:4px;line-height:1;color:var(--txt)}
+h1 .accent{color:var(--acc)}
+.subtitle{font-size:14px;color:var(--mut);margin-top:14px;max-width:520px;line-height:1.5}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:920px;width:100%}
+.tool-card{position:relative;background:var(--surf);border:1px solid var(--bdr);border-left:4px solid var(--accent-color);border-radius:12px;padding:24px;text-decoration:none;color:inherit;transition:.25s;display:flex;flex-direction:column;gap:12px;animation:fadeUp .5s ease backwards;overflow:hidden}
+.tool-card:nth-child(1){animation-delay:.1s}.tool-card:nth-child(2){animation-delay:.2s}.tool-card:nth-child(3){animation-delay:.3s}
+.tool-card.active{cursor:pointer}
+.tool-card.active:hover{border-color:var(--accent-color);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.tool-card.coming-soon{opacity:.5;cursor:not-allowed}
+.tool-card.c1{--accent-color:var(--acc)}
+.tool-card.c2{--accent-color:var(--purp)}
+.tool-card.c3{--accent-color:var(--acc2)}
+.t-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.t-icon{font-size:30px;line-height:1}
+.t-tag{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);padding:3px 9px;border:1px solid var(--bdr);border-radius:10px}
+.tool-card.active .t-tag{color:var(--accent-color);border-color:var(--accent-color)}
+.t-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--txt);line-height:1.1}
+.t-desc{font-size:13px;color:var(--mut);line-height:1.5;flex:1}
+.t-foot{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--mut)}
+.t-arrow{color:var(--mut);font-size:18px;transition:.2s}
+.tool-card.active .t-arrow{color:var(--accent-color)}
+.tool-card.active:hover .t-arrow{transform:translateX(4px)}
+footer{margin-top:60px;font-size:11px;color:var(--mut);letter-spacing:1px;text-align:center}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media (max-width:600px){body{padding:24px 16px 40px}header{margin-bottom:36px}h1{font-size:38px;letter-spacing:2px}.tool-card{padding:20px}}
+</style></head><body>
 
-  /* HEADER */
-  .hub-header{text-align:center;margin-bottom:48px}
-  .hub-eyebrow{
-    font-family:'Bebas Neue',sans-serif;font-size:11px;
-    letter-spacing:4px;color:var(--mut);text-transform:uppercase;margin-bottom:6px
-  }
-  .hub-title{
-    font-family:'Bebas Neue',sans-serif;font-size:52px;
-    letter-spacing:2px;line-height:1;color:var(--txt);
-  }
-  .hub-title span{color:var(--acc)}
-  .hub-sub{font-size:12px;color:var(--mut);margin-top:10px;letter-spacing:.5px}
-  .hub-line{
-    width:40px;height:2px;background:var(--acc);
-    margin:14px auto 0;border-radius:2px
-  }
+<a class="back" href="https://skeunou.github.io/">← MES UNIVERS</a>
 
-  /* CARDS */
-  .tools-grid{width:100%;max-width:420px;display:flex;flex-direction:column;gap:12px}
+<header>
+  <div class="hello">Sport & Performance</div>
+  <h1>LV <span class="accent">TOOL</span></h1>
+  <div class="subtitle">Mes outils de préparation et d'entraînement.</div>
+</header>
 
-  .tool-card{
-    background:var(--surf);border:1px solid var(--bdr);
-    border-radius:14px;padding:20px 20px 18px;
-    text-decoration:none;display:flex;align-items:center;gap:16px;
-    transition:border-color .2s,background .2s;
-    cursor:pointer;position:relative;overflow:hidden;
-  }
-  .tool-card::before{
-    content:"";position:absolute;inset:0;
-    background:linear-gradient(135deg,transparent 60%,rgba(255,255,255,.02));
-    pointer-events:none;
-  }
-  .tool-card:active{background:var(--surf2)}
+<main class="tools">
 
-  .tool-card.c1{border-left:3px solid var(--acc2)}
-  .tool-card.c2{border-left:3px solid var(--acc)}
-  .tool-card.c3{border-left:3px solid var(--purp)}
-  .tool-card.c4{border-left:3px solid var(--blue)}
-  .tool-card.c5{border-left:3px solid var(--grn)}
-
-  .tool-icon{
-    width:48px;height:48px;border-radius:12px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:24px;flex-shrink:0;
-  }
-  .tool-card.c1 .tool-icon{background:rgba(255,107,53,.12)}
-  .tool-card.c2 .tool-icon{background:rgba(232,255,71,.08)}
-  .tool-card.c3 .tool-icon{background:rgba(167,139,250,.1)}
-  .tool-card.c4 .tool-icon{background:rgba(56,189,248,.1)}
-  .tool-card.c5 .tool-icon{background:rgba(74,222,128,.08)}
-
-  .tool-body{flex:1;min-width:0}
-  .tool-tag{
-    font-family:'Bebas Neue',sans-serif;font-size:9px;
-    letter-spacing:2px;text-transform:uppercase;margin-bottom:3px
-  }
-  .tool-card.c1 .tool-tag{color:var(--acc2)}
-  .tool-card.c2 .tool-tag{color:var(--acc)}
-  .tool-card.c3 .tool-tag{color:var(--purp)}
-  .tool-card.c4 .tool-tag{color:var(--blue)}
-  .tool-card.c5 .tool-tag{color:var(--grn)}
-
-  .tool-name{
-    font-family:'Bebas Neue',sans-serif;font-size:22px;
-    letter-spacing:1px;color:var(--txt);line-height:1;margin-bottom:4px
-  }
-  .tool-desc{font-size:11px;color:var(--mut);line-height:1.5}
-
-  .tool-arrow{
-    font-size:18px;color:var(--mut);flex-shrink:0;margin-left:4px
-  }
-  .tool-card.c1:hover .tool-arrow,.tool-card.c1:active .tool-arrow{color:var(--acc2)}
-  .tool-card.c2:hover .tool-arrow,.tool-card.c2:active .tool-arrow{color:var(--acc)}
-  .tool-card.c3:hover .tool-arrow,.tool-card.c3:active .tool-arrow{color:var(--purp)}
-  .tool-card.c4:hover .tool-arrow,.tool-card.c4:active .tool-arrow{color:var(--blue)}
-  .tool-card.c5:hover .tool-arrow,.tool-card.c5:active .tool-arrow{color:var(--grn)}
-
-  /* COMING SOON */
-  .tool-card.soon{opacity:.45;cursor:default;pointer-events:none}
-  .soon-badge{
-    position:absolute;top:12px;right:12px;
-    font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-    padding:2px 7px;border-radius:3px;
-    background:rgba(107,107,120,.2);color:var(--mut);border:1px solid var(--bdr)
-  }
-
-  /* FOOTER */
-  .hub-footer{
-    margin-top:48px;text-align:center;
-    font-size:10px;color:var(--mut);letter-spacing:1px;line-height:1.8
-  }
-  .hub-footer strong{color:var(--acc);font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:12px}
-
-  /* PASSWORD GATE */
-  #lvgate{position:fixed;inset:0;z-index:9999;background:var(--bg);
-    display:flex;align-items:center;justify-content:center;padding:24px}
-  #lvgate.hidden{display:none}
-  .gate-card{width:100%;max-width:300px;text-align:center}
-  .gate-eyebrow{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;
-    color:var(--mut);text-transform:uppercase;margin-bottom:8px}
-  .gate-title{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;
-    line-height:1;color:var(--txt)}
-  .gate-title span{color:var(--acc)}
-  .gate-lock{font-size:30px;margin:18px 0 14px}
-  .gate-input{width:100%;background:var(--surf2);border:1px solid var(--bdr);border-radius:10px;
-    color:var(--txt);font-family:'DM Sans',sans-serif;font-size:22px;text-align:center;
-    letter-spacing:8px;padding:14px;outline:none}
-  .gate-input:focus{border-color:var(--acc)}
-  .gate-btn{width:100%;margin-top:12px;background:var(--acc);color:#000;border:none;border-radius:10px;
-    font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;padding:13px;cursor:pointer}
-  .gate-err{color:var(--acc2);font-size:12px;margin-top:10px;min-height:16px;letter-spacing:.5px}
-  .gate-shake{animation:gshake .35s}
-  @keyframes gshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-  .lock-again{margin-top:16px;font-size:11px;color:var(--mut);background:none;border:none;
-    cursor:pointer;letter-spacing:.5px;text-decoration:underline;font-family:'DM Sans',sans-serif}
-</style>
-</head>
-<body>
-
-<div id="lvgate">
-  <div class="gate-card">
-    <div class="gate-eyebrow">Accès privé</div>
-    <div class="gate-title">LV<span>'s</span> TOOLS</div>
-    <div class="gate-lock">🔒</div>
-    <input id="gatePw" class="gate-input" type="password" inputmode="numeric"
-           autocomplete="off" placeholder="••••" aria-label="Mot de passe">
-    <button id="gateBtn" class="gate-btn">Déverrouiller</button>
-    <div id="gateErr" class="gate-err"></div>
-  </div>
-</div>
-
-
-<div class="hub-header">
-  <div class="hub-eyebrow">Tableau de bord personnel</div>
-  <div class="hub-title">LV<span>'s</span> TOOLS</div>
-  <div class="hub-sub">Trail · Performance · Nutrition</div>
-  <div class="hub-line"></div>
-</div>
-
-<div class="tools-grid">
-
-  <a href="https://coach-nutrition.netlify.app" class="tool-card c1" target="_blank">
-    <div class="tool-icon">🥗</div>
-    <div class="tool-body">
-      <div class="tool-tag">Alimentation</div>
-      <div class="tool-name">Nutrition & Recettes</div>
-      <div class="tool-desc">Plans semaine · Macros · Micronutriments · Liste de courses</div>
-    </div>
-    <div class="tool-arrow">→</div>
+  <a href="trail/" class="tool-card c1 active">
+    <div class="t-head"><div class="t-icon">🏔️</div><div class="t-tag">Trail</div></div>
+    <div class="t-name">UNIVERS TRAIL</div>
+    <div class="t-desc">Renforcement spécifique, plan d'entraînement et nutrition GPX pour trail/ultra.</div>
+    <div class="t-foot"><span>3 outils</span><span class="t-arrow">→</span></div>
   </a>
 
-  <a href="https://skeunou.github.io/coach-renfo/" class="tool-card c2" target="_blank">
-    <div class="tool-icon">💪</div>
-    <div class="tool-body">
-      <div class="tool-tag">Entraînement</div>
-      <div class="tool-name">Renforcement Trail</div>
-      <div class="tool-desc">Fiches séances · Timer récup · Progression · Historique</div>
-    </div>
-    <div class="tool-arrow">→</div>
+  <a href="wod-renfo/" class="tool-card c2 active">
+    <div class="t-head"><div class="t-icon">💪</div><div class="t-tag">Force</div></div>
+    <div class="t-name">WOD / RENFO</div>
+    <div class="t-desc">Générateur de WOD CrossFit et programme de renforcement personnalisé.</div>
+    <div class="t-foot"><span>2 outils</span><span class="t-arrow">→</span></div>
   </a>
 
-  <a href="https://skeunou.github.io/coach-wod/" class="tool-card c3" target="_blank">
-    <div class="tool-icon">⚡</div>
-    <div class="tool-body">
-      <div class="tool-tag">CrossFit</div>
-      <div class="tool-name">WOD Generator</div>
-      <div class="tool-desc">AMRAP · EMOM · For Time · Adapté à ta phase trail</div>
-    </div>
-    <div class="tool-arrow">→</div>
+  <a href="https://coach-nutrition.netlify.app" class="tool-card c3 active">
+    <div class="t-head"><div class="t-icon">🍽️</div><div class="t-tag">Nutrition</div></div>
+    <div class="t-name">PLANNING RECETTES</div>
+    <div class="t-desc">Plans de menus hebdomadaires orientés performance trail.</div>
+    <div class="t-foot"><span>Coach Nutrition</span><span class="t-arrow">→</span></div>
   </a>
 
-  <a href="https://skeunou.github.io/coach-nutritrail/" class="tool-card c4" target="_blank">
-    <div class="tool-icon">📍</div>
-    <div class="tool-body">
-      <div class="tool-tag">GPX · Nutrition</div>
-      <div class="tool-name">NutriTrail GPX</div>
-      <div class="tool-desc">Temps de passage · Plan nutrition · Export PDF mémo course</div>
-    </div>
-    <div class="tool-arrow">→</div>
-  </a>
+</main>
 
-  <a href="https://lvrenfo.netlify.app" class="tool-card c5" target="_blank">
-    <div class="tool-icon">🏋️</div>
-    <div class="tool-body">
-      <div class="tool-tag">Coaching · Personnalisé</div>
-      <div class="tool-name">Coach Renfo Perso</div>
-      <div class="tool-desc">Programme IA sur-mesure · Full-body · Check-in état du jour · Neuro-nutrition</div>
-    </div>
-    <div class="tool-arrow">→</div>
-  </a>
+<footer>Construit sur mesure · Données locales · Aucune pub</footer>
 
-</div>
-
-<div class="hub-footer">
-  <strong>LV's TOOLS</strong><br>
-  Construit sur mesure · Données locales · Aucune pub<br>
-  <button class="lock-again" onclick="lvLock()">🔒 Verrouiller</button>
-</div>
-
-
-<script>
-(function(){
-  var HASH="f8a5da214f3f6c281e008924914e7decf9a13637737204589eed04379dc600a8";
-  var KEY="lvtools:unlocked";
-  var gate=document.getElementById('lvgate');
-  var inp=document.getElementById('gatePw');
-  var btn=document.getElementById('gateBtn');
-  var err=document.getElementById('gateErr');
-  var card=gate.querySelector('.gate-card');
-
-  function unlock(persist){ if(persist){ try{localStorage.setItem(KEY,'1');}catch(e){} } gate.classList.add('hidden'); }
-  function lock(){ try{localStorage.removeItem(KEY);}catch(e){} gate.classList.remove('hidden'); inp.value=''; setTimeout(function(){inp.focus();},50); }
-  window.lvLock=lock;
-
-  try{ if(localStorage.getItem(KEY)==='1'){ gate.classList.add('hidden'); } }catch(e){}
-
-  async function sha256(s){
-    var buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-    return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
-  }
-  async function check(){
-    err.textContent='';
-    var h=await sha256((inp.value||'').trim());
-    if(h===HASH){ unlock(true); }
-    else{
-      err.textContent='Code incorrect';
-      card.classList.remove('gate-shake'); void card.offsetWidth; card.classList.add('gate-shake');
-      inp.value=''; inp.focus();
-    }
-  }
-  btn.addEventListener('click',check);
-  inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ check(); } });
-  if(!gate.classList.contains('hidden')){ setTimeout(function(){inp.focus();},100); }
-})();
-</script>
-</body>
-</html>
+</body></html>
