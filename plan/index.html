@@ -29,7 +29,7 @@ header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:2px s
 .obj .odate{font-size:8px;color:var(--mut);letter-spacing:1px;text-transform:uppercase}
 .tabs{display:flex;gap:6px;margin-top:8px}
 .tab{flex:1;text-align:center;padding:8px;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;
-  font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.5px;color:var(--mut);cursor:pointer}
+  font-family:'Bebas Neue',sans-serif;font-size:12.5px;letter-spacing:.3px;color:var(--mut);cursor:pointer}
 .tab.active{background:var(--acc);color:#000;border-color:var(--acc)}
 .wrap{padding:12px 14px;max-width:560px;margin:0 auto}
 .view{display:none}.view.active{display:block}
@@ -142,6 +142,7 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
   <div class="tabs">
     <div class="tab active" data-tab="cal">Calendrier</div>
     <div class="tab" data-tab="macro">Macro</div>
+    <div class="tab" data-tab="renfo">Renfo</div>
     <div class="tab" data-tab="zones">Zones</div>
     <div class="tab" data-tab="aide">Aide</div>
   </div>
@@ -190,6 +191,8 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
 
   <!-- ZONES -->
   <div class="view" id="view-macro"></div>
+
+  <div class="view" id="view-renfo"></div>
 
   <div class="view aide" id="view-zones"></div>
 
@@ -590,14 +593,24 @@ function renderMacro(){
   }
   el.innerHTML=h;
 }
+function renderRenfo(){
+  var el=document.getElementById("view-renfo");if(!el||el.dataset.loaded)return;el.dataset.loaded="1";
+  el.innerHTML='<div style="background:linear-gradient(90deg,rgba(232,255,71,.08),rgba(167,139,250,.14));border:1px solid var(--purp);border-radius:10px;padding:10px 12px;margin-bottom:10px">'
+    +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:17px;color:var(--purp);letter-spacing:1px">RENFO — COUPLÉ AU PLAN</div>'
+    +'<p style="margin:5px 0 0;font-size:12.5px;color:var(--mut);line-height:1.45">Séance type <b style="color:var(--txt)">Bloc 1 — Fondation</b> (<b style="color:var(--acc2)">provisoire</b>, à recalibrer ~6 juil sur tes données réelles). Moteur Coach Renfo embarqué : timers, séries, tabata et bilan fonctionnent ici.</p>'
+    +'</div>'
+    +'<iframe src="renfo-b1/index.html" allow="screen-wake-lock" style="width:100%;height:78vh;border:1px solid var(--bdr);border-radius:10px;background:var(--bg)"></iframe>';
+}
 function setTab(name){
   var tabs=document.querySelectorAll(".tab");for(var i=0;i<tabs.length;i++)tabs[i].classList.toggle("active",tabs[i].getAttribute("data-tab")===name);
   document.getElementById("view-cal").classList.toggle("active",name==="cal");
   document.getElementById("view-macro").classList.toggle("active",name==="macro");
+  document.getElementById("view-renfo").classList.toggle("active",name==="renfo");
   document.getElementById("view-zones").classList.toggle("active",name==="zones");
   document.getElementById("view-aide").classList.toggle("active",name==="aide");
   if(name==="zones")renderZones();
   if(name==="macro")renderMacro();
+  if(name==="renfo")renderRenfo();
 }
 document.querySelectorAll(".tab").forEach(function(t){t.onclick=function(){setTab(t.getAttribute("data-tab"))}});
 
