@@ -230,17 +230,29 @@ var DOWS=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
 
 var BLOCKS=[
  {from:"2026-06-15",to:"2026-07-05",name:"Bloc R — Récupération",charge:1,
-  obj:"Régénérer après St-Jacques.",focus:"Récup totale · réintro douce du renfo chaîne adducteur G · zéro charge longue."},
+  obj:"Régénérer après St-Jacques.",
+  focus:"Récup totale · zéro charge longue.",
+  renfo:"Réintro douce : chaîne adducteur G, gainage, mobilité. Aucune charge lourde."},
  {from:"2026-07-06",to:"2026-08-02",name:"Bloc 1 — Réathlé + amorce VAM",charge:2,
-  obj:"Reconstruire, amorcer l'économie de grimpe.",focus:"Côtes courtes + cadence · réintro excentrique douce · intégration des bâtons · fondation force."},
+  obj:"Reconstruire, amorcer l'économie de grimpe.",
+  focus:"Côtes courtes + cadence · tapis incliné · intégration des bâtons.",
+  renfo:"Fondation tissulaire : excentrique léger, mollets/soléaire, adducteurs G. Réhabituer."},
  {from:"2026-08-03",to:"2026-11-15",name:"Bloc 2 — Base aérobie + économie",charge:3,
-  obj:"Volume large + vitesse/économie.",focus:"Gros fond aérobie · VMA/économie · côtes au seuil. Repère : 10K de Caluire (11 oct)."},
+  obj:"Volume large + vitesse/économie.",
+  focus:"Fond aérobie · VMA/économie · tapis raide + bâtons. Repère : 10K Caluire (11 oct).",
+  renfo:"Force générale full-body · début excentrique quadriceps · endurance de force mollets."},
  {from:"2026-11-16",to:"2027-02-14",name:"Bloc 3 — Force + endurance hivernale",charge:4,
-  obj:"Force structurelle, construire le moteur à D+.",focus:"Force-puissance trail · endurance longue · force-endurance en côte. Repère : 25K Givré (31 jan)."},
+  obj:"Force structurelle : le cœur de la durabilité.",
+  focus:"Endurance longue · force-endurance en côte/tapis. Repère : 25K Givré (31 jan).",
+  renfo:"PIC RENFO : excentrique quadriceps lourd (durabilité descente), chaîne postérieure, force-endurance."},
  {from:"2027-02-15",to:"2027-05-31",name:"Bloc 4 — Spécifique long + montagne",charge:5,
-  obj:"Pic de charge : trail long technique, gros D+.",focus:"Longues sorties montagne · volume D+/D- max · excentrique descente. Chianti 46K (19 mar) · Paladru 84K (18 avr) · Maxi-Race (29 mai)."},
+  obj:"Pic de charge : trail long, gros D+ (courses + chocs).",
+  focus:"Sorties montagne · excentrique descente · D-. Chianti (19 mar) · Paladru (18 avr) · Maxi-Race (29 mai).",
+  renfo:"Convertir la force en durabilité : excentrique spécifique descente, pré-fatigue, maintien."},
  {from:"2027-06-01",to:"2027-07-15",name:"Bloc 5 — Multi-jours + affûtage",charge:3,
-  obj:"Spécificité étapes, puis arriver FRAIS.",focus:"Ardéchoise vélo (19 juin, D+ sans impact) · simu 4×20 km (Sam→Mar) · affûtage réel → UT4M (15 juil)."}
+  obj:"Spécificité étapes, puis arriver FRAIS.",
+  focus:"Ardéchoise vélo (19 juin) · simu 4×20 (Sam→Mar) · affûtage → UT4M (15 juil).",
+  renfo:"Entretien léger uniquement. Zéro création de fatigue avant l'objectif."}
 ];
 
 var PLAN={
@@ -559,8 +571,9 @@ function renderMacro(){
   var el=document.getElementById("view-macro");if(!el)return;
   var h='<div style="background:linear-gradient(90deg,rgba(232,255,71,.10),rgba(255,107,53,.10));border:1px solid var(--acc);border-radius:10px;padding:11px 13px;margin-bottom:14px">'
     +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--acc);letter-spacing:1px">CAP UT4M 180 · JUIL. 2027</div>'
-    +'<p style="margin:6px 0 0;font-size:13px;color:var(--txt);line-height:1.45">Base aérobie large d\'abord, intensité spécifique <b>tard</b>. La charge monte par paliers jusqu\'au Bloc 4, puis chute pour arriver <b>frais</b>. Décharge ~1 sem/3-4. Les courses sont des repères, pas des objectifs sur-affûtés.</p>'
-    +'<p style="margin:7px 0 0;font-size:12px;color:var(--mut)">⚑ Limiteur n°1 : <b style="color:var(--txt)">économie de grimpe (VAM)</b> — cible transverse de tout le cycle.</p>'
+    +'<p style="margin:6px 0 0;font-size:13px;color:var(--txt);line-height:1.45">Projet <b>durabilité + économie + gestion</b>, pas volume brut — ça joue sur tes forces et ça tient dans ta vie. Le D+ qu\'on ne fait pas se compense : <b>force/excentrique</b>, <b>tapis incliné raide + bâtons</b>, blocs choc + courses, vélo.</p>'
+    +'<p style="margin:7px 0 0;font-size:12.5px;color:var(--mut);line-height:1.45">Base aérobie large d\'abord, intensité spécifique <b style="color:var(--txt)">tard</b>. La charge monte par paliers jusqu\'au Bloc 4 puis chute pour arriver <b style="color:var(--txt)">frais</b>. Décharge ~1 sem/3-4.</p>'
+    +'<p style="margin:7px 0 0;font-size:12px;color:var(--mut)">⚑ Point dur : la <b style="color:var(--txt)">descente sur 4 jours</b> (excentrique). Le <b style="color:var(--purp)">renfo</b> est la colonne vertébrale du cycle — voir l\'accent force par bloc.</p>'
     +'</div>';
   for(var i=0;i<BLOCKS.length;i++){
     var b=BLOCKS[i];
@@ -572,6 +585,7 @@ function renderMacro(){
       +'<div style="margin-bottom:7px">'+bar+' <span style="font-size:10px;color:var(--mut);vertical-align:2px">charge</span></div>'
       +'<div style="font-size:13px;color:var(--txt);font-weight:500;margin-bottom:3px">'+b.obj+'</div>'
       +'<div style="font-size:12.5px;color:var(--mut);line-height:1.4">'+b.focus+'</div>'
+      +'<div style="font-size:12px;line-height:1.4;margin-top:6px;padding-top:6px;border-top:1px solid var(--bdr)"><b style="color:var(--purp)">Renfo :</b> <span style="color:var(--mut)">'+(b.renfo||'')+'</span></div>'
       +'</div>';
   }
   el.innerHTML=h;
