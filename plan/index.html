@@ -29,7 +29,7 @@ header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:2px s
 .obj .odate{font-size:8px;color:var(--mut);letter-spacing:1px;text-transform:uppercase}
 .tabs{display:flex;gap:6px;margin-top:8px}
 .tab{flex:1;text-align:center;padding:8px;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;
-  font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--mut);cursor:pointer}
+  font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.5px;color:var(--mut);cursor:pointer}
 .tab.active{background:var(--acc);color:#000;border-color:var(--acc)}
 .wrap{padding:12px 14px;max-width:560px;margin:0 auto}
 .view{display:none}.view.active{display:block}
@@ -141,6 +141,7 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
   </div>
   <div class="tabs">
     <div class="tab active" data-tab="cal">Calendrier</div>
+    <div class="tab" data-tab="macro">Macro</div>
     <div class="tab" data-tab="zones">Zones</div>
     <div class="tab" data-tab="aide">Aide</div>
   </div>
@@ -188,6 +189,8 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
   </div>
 
   <!-- ZONES -->
+  <div class="view" id="view-macro"></div>
+
   <div class="view aide" id="view-zones"></div>
 
   <!-- AIDE -->
@@ -226,8 +229,18 @@ var MONTHS=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","
 var DOWS=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
 
 var BLOCKS=[
- {from:"2026-06-15",to:"2026-07-05",name:"Bloc R — Récupération post-St-Jacques"},
- {from:"2026-07-06",to:"2026-08-02",name:"Bloc 1 — Réathlé + correction VAM"}
+ {from:"2026-06-15",to:"2026-07-05",name:"Bloc R — Récupération",charge:1,
+  obj:"Régénérer après St-Jacques.",focus:"Récup totale · réintro douce du renfo chaîne adducteur G · zéro charge longue."},
+ {from:"2026-07-06",to:"2026-08-02",name:"Bloc 1 — Réathlé + amorce VAM",charge:2,
+  obj:"Reconstruire, amorcer l'économie de grimpe.",focus:"Côtes courtes + cadence · réintro excentrique douce · intégration des bâtons · fondation force."},
+ {from:"2026-08-03",to:"2026-11-15",name:"Bloc 2 — Base aérobie + économie",charge:3,
+  obj:"Volume large + vitesse/économie.",focus:"Gros fond aérobie · VMA/économie · côtes au seuil. Repère : 10K de Caluire (11 oct)."},
+ {from:"2026-11-16",to:"2027-02-14",name:"Bloc 3 — Force + endurance hivernale",charge:4,
+  obj:"Force structurelle, construire le moteur à D+.",focus:"Force-puissance trail · endurance longue · force-endurance en côte. Repère : 25K Givré (31 jan)."},
+ {from:"2027-02-15",to:"2027-05-31",name:"Bloc 4 — Spécifique long + montagne",charge:5,
+  obj:"Pic de charge : trail long technique, gros D+.",focus:"Longues sorties montagne · volume D+/D- max · excentrique descente. Chianti 46K (19 mar) · Paladru 84K (18 avr) · Maxi-Race (29 mai)."},
+ {from:"2027-06-01",to:"2027-07-15",name:"Bloc 5 — Multi-jours + affûtage",charge:3,
+  obj:"Spécificité étapes, puis arriver FRAIS.",focus:"Ardéchoise vélo (19 juin, D+ sans impact) · simu 4×20 km (Sam→Mar) · affûtage réel → UT4M (15 juil)."}
 ];
 
 var PLAN={
@@ -541,12 +554,36 @@ function renderZones(){
   el.innerHTML=h;
 }
 
+function fmtBlk(s){var d=parseISO(s);var m=["jan","fév","mar","avr","mai","juin","juil","aoû","sep","oct","nov","déc"];return d.getDate()+" "+m[d.getMonth()]+" "+String(d.getFullYear()).slice(2);}
+function renderMacro(){
+  var el=document.getElementById("view-macro");if(!el)return;
+  var h='<div style="background:linear-gradient(90deg,rgba(232,255,71,.10),rgba(255,107,53,.10));border:1px solid var(--acc);border-radius:10px;padding:11px 13px;margin-bottom:14px">'
+    +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;color:var(--acc);letter-spacing:1px">CAP UT4M 180 · JUIL. 2027</div>'
+    +'<p style="margin:6px 0 0;font-size:13px;color:var(--txt);line-height:1.45">Base aérobie large d\'abord, intensité spécifique <b>tard</b>. La charge monte par paliers jusqu\'au Bloc 4, puis chute pour arriver <b>frais</b>. Décharge ~1 sem/3-4. Les courses sont des repères, pas des objectifs sur-affûtés.</p>'
+    +'<p style="margin:7px 0 0;font-size:12px;color:var(--mut)">⚑ Limiteur n°1 : <b style="color:var(--txt)">économie de grimpe (VAM)</b> — cible transverse de tout le cycle.</p>'
+    +'</div>';
+  for(var i=0;i<BLOCKS.length;i++){
+    var b=BLOCKS[i];
+    var cur=(TODAY_ISO>=b.from&&TODAY_ISO<=b.to);
+    var bar='';for(var c=1;c<=5;c++){var on=c<=(b.charge||0);bar+='<span style="display:inline-block;width:15px;height:7px;border-radius:2px;margin-right:3px;background:'+(on?(b.charge>=5?'var(--acc2)':'var(--acc)'):'var(--bdr)')+'"></span>';}
+    h+='<div style="background:var(--surf);border:1px solid '+(cur?'var(--acc)':'var(--bdr)')+';border-radius:10px;padding:11px 12px;margin-bottom:9px">'
+      +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:17px;letter-spacing:.5px;color:'+(cur?'var(--acc)':'var(--txt)')+'">'+b.name+(cur?' <span style="font-size:10px;color:#000;background:var(--acc);padding:1px 6px;border-radius:4px;vertical-align:2px">EN COURS</span>':'')+'</div>'
+      +'<div style="font-size:11px;color:var(--mut);margin:3px 0 7px;letter-spacing:.5px">'+fmtBlk(b.from)+' → '+fmtBlk(b.to)+'</div>'
+      +'<div style="margin-bottom:7px">'+bar+' <span style="font-size:10px;color:var(--mut);vertical-align:2px">charge</span></div>'
+      +'<div style="font-size:13px;color:var(--txt);font-weight:500;margin-bottom:3px">'+b.obj+'</div>'
+      +'<div style="font-size:12.5px;color:var(--mut);line-height:1.4">'+b.focus+'</div>'
+      +'</div>';
+  }
+  el.innerHTML=h;
+}
 function setTab(name){
   var tabs=document.querySelectorAll(".tab");for(var i=0;i<tabs.length;i++)tabs[i].classList.toggle("active",tabs[i].getAttribute("data-tab")===name);
   document.getElementById("view-cal").classList.toggle("active",name==="cal");
+  document.getElementById("view-macro").classList.toggle("active",name==="macro");
   document.getElementById("view-zones").classList.toggle("active",name==="zones");
   document.getElementById("view-aide").classList.toggle("active",name==="aide");
   if(name==="zones")renderZones();
+  if(name==="macro")renderMacro();
 }
 document.querySelectorAll(".tab").forEach(function(t){t.onclick=function(){setTab(t.getAttribute("data-tab"))}});
 
@@ -557,7 +594,7 @@ function initBanner(){
   if(today.getDay()===0) document.getElementById("banner").classList.add("show");
 }
 
-renderDows();renderCal();renderRPE();initBanner();renderNext();renderZones();
+renderDows();renderCal();renderRPE();initBanner();renderNext();renderZones();renderMacro();
 </script>
 </body>
 </html>
