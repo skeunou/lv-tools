@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LV TOOL — Mes Outils Sport</title>
+<title>NUTRI-SPORT — LV Tool</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0d0d0f;--surf:#141416;--surf2:#1c1c20;--bdr:#2a2a30;--acc:#e8ff47;--acc2:#ff6b35;--warn:#ff9500;--txt:#f0f0f0;--mut:#6b6b78;--grn:#4ade80;--red:#f87171;--purp:#a78bfa;--blue:#38bdf8}
@@ -42,51 +42,57 @@ footer{margin-top:60px;font-size:11px;color:var(--mut);letter-spacing:1px;text-a
 @media (max-width:600px){body{padding:24px 16px 40px}header{margin-bottom:36px}h1{font-size:38px;letter-spacing:2px}.tool-card{padding:20px}}
 </style></head><body>
 
-<a class="back" href="https://skeunou.github.io/">← MES UNIVERS</a>
+<a class="back" href="https://skeunou.github.io/">← LV TOOL</a>
 
 <header>
-  <div class="hello">Sport & Performance</div>
-  <h1>LV <span class="accent">TOOL</span></h1>
-  <div class="subtitle">Mes outils de préparation et d'entraînement.</div>
+  <div class="hello">Sport · Nutrition · Performance</div>
+  <h1>NUTRI-<span class="accent">SPORT</span></h1>
+  <div class="subtitle">Plan trail, menus perf et nutrition de course.</div>
 </header>
 
 <main class="tools">
 
-  <!-- NOUVEAU : Univers Trail V2 — cabine de pilotage quotidienne -->
+  <!-- 1. PPL : TRAIL V2 — cabine de pilotage quotidienne (WOD + Renfo perso désormais intégrés dedans) -->
   <a href="https://skeunou.github.io/coach-renfo/trail-v2.html" class="tool-card c1 active">
-    <div class="t-head"><div class="t-icon">🏔️</div><div class="t-tag">Trail</div></div>
-    <div class="t-name">UNIVERS TRAIL</div>
-    <div class="t-desc">Plan UT4M, séances guidées, WOD supp et suivi Strava — ta cabine de pilotage quotidienne.</div>
+    <div class="t-head"><div class="t-icon">📋</div><div class="t-tag">Trail · Plan</div></div>
+    <div class="t-name">PLAN PERSO LOCALISÉ</div>
+    <div class="t-desc">PPL — Trail V2 : plan UT4M, séances guidées, WOD & renfo intégrés, suivi Strava. Ta cabine de pilotage.</div>
     <div class="t-foot"><span>Trail V2</span><span class="t-arrow">→</span></div>
   </a>
 
-  <!-- EN SOMMEIL : ancien Univers Trail (hub 3 outils, dont NutriTrail GPX). Conservé, réactivable en retirant display:none. -->
-  <a href="trail/" class="tool-card c1 active" style="display:none">
-    <div class="t-head"><div class="t-icon">🏔️</div><div class="t-tag">Trail</div></div>
-    <div class="t-name">UNIVERS TRAIL (ancien)</div>
-    <div class="t-desc">Renforcement spécifique, plan d'entraînement et nutrition GPX pour trail/ultra.</div>
-    <div class="t-foot"><span>3 outils</span><span class="t-arrow">→</span></div>
-  </a>
-
-  <a href="wod-renfo/" class="tool-card c2 active">
-    <div class="t-head"><div class="t-icon">💪</div><div class="t-tag">Force</div></div>
-    <div class="t-name">WOD / RENFO</div>
-    <div class="t-desc">Générateur de WOD CrossFit et programme de renforcement personnalisé.</div>
-    <div class="t-foot"><span>2 outils</span><span class="t-arrow">→</span></div>
-  </a>
-
+  <!-- 2. PLANNING RECETTES -->
   <a href="https://coach-nutrition.netlify.app" class="tool-card c3 active">
     <div class="t-head"><div class="t-icon">🍽️</div><div class="t-tag">Nutrition</div></div>
     <div class="t-name">PLANNING RECETTES</div>
-    <div class="t-desc">Plans de menus hebdomadaires orientés performance trail.</div>
-    <div class="t-foot"><span>Coach Nutrition</span><span class="t-arrow">→</span></div>
+    <div class="t-desc">Plans de menus hebdomadaires orientés performance et récupération trail.</div>
+    <div class="t-foot"><span>Menus</span><span class="t-arrow">→</span></div>
   </a>
-  <!-- Raccourci NutriTrail GPX (en attendant intégration à la V2) -->
+
+  <!-- 3. NUTRI PLANNER (GPX) -->
   <a href="https://skeunou.github.io/coach-nutritrail/" class="tool-card active" style="--accent-color:#38bdf8">
-    <div class="t-head"><div class="t-icon">📍</div><div class="t-tag">GPX · Nutrition</div></div>
-    <div class="t-name">NUTRITRAIL GPX</div>
+    <div class="t-head"><div class="t-icon">📍</div><div class="t-tag">GPX · Course</div></div>
+    <div class="t-name">NUTRI PLANNER</div>
     <div class="t-desc">Plan nutrition et temps de passage à partir d'un fichier GPX de course.</div>
-    <div class="t-foot"><span>NutriTrail</span><span class="t-arrow">→</span></div>
+    <div class="t-foot"><span>Nutri Planner GPX</span><span class="t-arrow">→</span></div>
+  </a>
+
+  <!-- ===================== EN SOMMEIL ===================== -->
+  <!-- Réactivables en retirant style="display:none". -->
+
+  <!-- SOMMEIL : ancien Univers Trail (hub 3 outils) -->
+  <a href="trail/" class="tool-card c1 active" style="display:none">
+    <div class="t-head"><div class="t-icon">🏔️</div><div class="t-tag">Trail</div></div>
+    <div class="t-name">UNIVERS TRAIL (ancien)</div>
+    <div class="t-desc">Ancien hub 3 outils. Remplacé par le PPL Trail V2.</div>
+    <div class="t-foot"><span>archivé</span><span class="t-arrow">→</span></div>
+  </a>
+
+  <!-- SOMMEIL : WOD / RENFO — désormais intégrés dans Trail V2 -->
+  <a href="wod-renfo/" class="tool-card c2 active" style="display:none">
+    <div class="t-head"><div class="t-icon">💪</div><div class="t-tag">Force</div></div>
+    <div class="t-name">WOD / RENFO</div>
+    <div class="t-desc">Générateur WOD + renfo perso. Intégrés dans Trail V2.</div>
+    <div class="t-foot"><span>intégré PPL</span><span class="t-arrow">→</span></div>
   </a>
 
 </main>
@@ -94,3 +100,4 @@ footer{margin-top:60px;font-size:11px;color:var(--mut);letter-spacing:1px;text-a
 <footer>Construit sur mesure · Données locales · Aucune pub</footer>
 
 </body></html>
+
