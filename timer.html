@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0d0d0f">
+<title>LV TIMER — Minuteur sport</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0f;--surf:#141416;--surf2:#1c1c20;--bdr:#2a2a30;--acc:#e8ff47;--acc2:#ff6b35;--warn:#ff9500;--txt:#f0f0f0;--mut:#6b6b78;--grn:#4ade80;--red:#f87171;--purp:#a78bfa;--blue:#38bdf8}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;min-height:100vh}
+body{padding:0 16px calc(40px + env(safe-area-inset-bottom))}
+.bebas{font-family:'Bebas Neue',sans-serif;letter-spacing:2px}
+
+header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:2px solid var(--acc);padding:14px 0 10px;margin:0 -16px 16px;padding-left:16px;padding-right:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+header h1{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;line-height:1}
+header h1 span{color:var(--acc)}
+.back{font-size:11px;color:var(--mut);text-decoration:none;letter-spacing:1px;border:1px solid var(--bdr);border-radius:8px;padding:6px 10px}
+
+/* ---- onglets modes ---- */
+.modes{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;scrollbar-width:none}
+.modes::-webkit-scrollbar{display:none}
+.modes button{flex:0 0 auto;background:var(--surf);border:1px solid var(--bdr);color:var(--mut);font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1.5px;padding:9px 15px;border-radius:9px;cursor:pointer}
+.modes button.on{background:var(--acc);border-color:var(--acc);color:#0d0d0f}
+
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:16px;margin-bottom:14px}
+.eyebrow{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.desc{font-size:12.5px;color:var(--mut);line-height:1.5;margin-bottom:14px}
+
+/* ---- steppers ---- */
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--bdr)}
+.row:last-child{border-bottom:none}
+.row .lab{font-size:13.5px;font-weight:600}
+.row .lab small{display:block;font-size:11px;color:var(--mut);font-weight:400;margin-top:2px}
+.step{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.step button{width:38px;height:38px;border-radius:9px;background:var(--surf2);border:1px solid var(--bdr);color:var(--txt);font-size:20px;line-height:1;cursor:pointer}
+.step button:active{background:var(--acc);color:#0d0d0f}
+.step .val{min-width:66px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--acc)}
+
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.presets button{background:var(--surf2);border:1px solid var(--bdr);color:var(--txt);font-size:12px;font-weight:600;padding:8px 12px;border-radius:8px;cursor:pointer}
+.presets button:active{border-color:var(--acc);color:var(--acc)}
+
+.summary{font-size:12.5px;color:var(--mut);text-align:center;margin:-4px 0 14px}
+.summary b{color:var(--txt)}
+
+.btn-go{width:100%;background:var(--acc);color:#0d0d0f;border:none;border-radius:12px;padding:18px;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;cursor:pointer}
+.btn-go:active{transform:scale(.99)}
+
+/* ---- écran de run ---- */
+#run{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;background:var(--bg);padding:calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
+#run.on{display:flex}
+#run .top{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;opacity:.75}
+#run .mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+#phase{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:5px}
+#clock{font-family:'Bebas Neue',sans-serif;font-size:clamp(90px,30vw,150px);line-height:.9;letter-spacing:2px;font-variant-numeric:tabular-nums}
+#sub{font-size:14px;opacity:.75;letter-spacing:1px;min-height:20px;text-align:center}
+#nextup{font-size:12px;opacity:.55;letter-spacing:1px;margin-top:8px;text-transform:uppercase}
+#bar{height:5px;border-radius:3px;background:rgba(255,255,255,.16);overflow:hidden;margin-bottom:14px}
+#bar i{display:block;height:100%;width:0;background:currentColor}
+#run .acts{display:flex;gap:10px}
+#run .acts button{flex:1;border-radius:11px;padding:16px 8px;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;border:2px solid currentColor;background:transparent;color:inherit;cursor:pointer}
+#run .acts button.solid{background:currentColor;border-color:currentColor}
+#run .acts button.solid span{color:var(--bg)}
+#run.work{background:var(--acc);color:#0d0d0f}
+#run.rest{background:var(--acc2);color:#12080a}
+#run.prep{background:var(--blue);color:#06131b}
+#run.done{background:var(--grn);color:#04140a}
+#run.chrono{background:var(--bg);color:var(--txt)}
+#run.paused{filter:saturate(.35) brightness(.8)}
+
+/* ---- chrono ---- */
+#recupBox{margin-top:6px}
+#recupClock{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:2px;line-height:1;color:var(--acc2)}
+#laps{max-height:24vh;overflow:auto;width:100%;margin-top:12px;font-size:13px}
+#laps div{display:flex;justify-content:space-between;padding:6px 2px;border-bottom:1px solid rgba(255,255,255,.08);font-variant-numeric:tabular-nums}
+#laps div span:first-child{opacity:.6}
+.chip{display:inline-block;background:rgba(0,0,0,.12);border-radius:8px;padding:5px 11px;font-size:12px;font-weight:700;margin:3px}
+footer{text-align:center;font-size:11px;color:var(--mut);letter-spacing:1px;margin-top:26px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>LV <span>TIMER</span></h1>
+  <a class="back" href="https://skeunou.github.io/nutri-sport/">← NUTRI-SPORT</a>
+</header>
+
+<div class="modes" id="modes"></div>
+<div id="cfg"></div>
+<div class="summary" id="sum"></div>
+<button class="btn-go" onclick="start()">DÉMARRER</button>
+
+<footer>Écran maintenu allumé pendant l'effort · Données locales</footer>
+
+<!-- ================= ÉCRAN RUN ================= -->
+<section id="run">
+  <div class="top"><span id="topL">—</span><span id="topR">—</span></div>
+  <div class="mid">
+    <div id="phase">PRÉPARATION</div>
+    <div id="clock">00:00</div>
+    <div id="sub"></div>
+    <div id="recupBox" style="display:none">
+      <div id="recupClock">00:00</div>
+      <div style="text-align:center;margin-top:6px" id="recupBtns"></div>
+    </div>
+    <div id="laps" style="display:none"></div>
+    <div id="nextup"></div>
+  </div>
+  <div id="bar"><i></i></div>
+  <div class="acts">
+    <button onclick="togglePause()"><span id="ppLbl">PAUSE</span></button>
+    <button id="skipBtn" onclick="skip()"><span>SUIVANT</span></button>
+    <button class="solid" onclick="stopRun()"><span>STOP</span></button>
+  </div>
+</section>
+
+<script>
+/* ============ AUDIO ============ */
+var actx=null;
+function unlockAudio(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(actx&&actx.state==="suspended"){ actx.resume(); } }
+function beep(f,d,vol){ if(!actx)return; try{ var o=actx.createOscillator(),g=actx.createGain(); o.type="sine"; o.frequency.value=f; o.connect(g); g.connect(actx.destination);
+  g.gain.setValueAtTime(.0001,actx.currentTime); g.gain.exponentialRampToValueAtTime(vol||.8,actx.currentTime+.02); g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);
+  o.start(); o.stop(actx.currentTime+d); }catch(e){} }
+function buzz(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
+function sigTick(){ beep(760,.09,.5); }
+function sigWork(){ beep(1046,.32); buzz(180); }
+function sigRest(){ beep(523,.32); buzz([90,70,90]); }
+function sigEnd(){ beep(1046,.2); setTimeout(function(){beep(1318,.2);},210); setTimeout(function(){beep(1568,.45);},420); buzz([200,90,200,90,300]); }
+
+/* ============ WAKE LOCK ============ */
+var wl=null;
+function reqWake(){ try{ if("wakeLock" in navigator){ navigator.wakeLock.request("screen").then(function(s){ wl=s; }).catch(function(){}); } }catch(e){} }
+function relWake(){ try{ if(wl){ wl.release(); wl=null; } }catch(e){} }
+document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible" && R.active) reqWake(); });
+
+/* ============ CONFIG ============ */
+var KEY="timer:cfg:v2";
+var DEF={
+  mode:"tabata",
+  tabata:{prep:10,work:20,rest:10,rounds:8,sets:1,setrest:60},
+  emom:{prep:10,interval:60,rounds:10},
+  amrap:{prep:10,dur:720},
+  fortime:{prep:10,cap:1200},
+  chrono:{recup:60}
+};
+var C=load();
+function load(){ try{ var s=JSON.parse(localStorage.getItem(KEY)); if(s&&s.mode){ for(var k in DEF){ if(typeof DEF[k]==="object"){ s[k]=Object.assign({},DEF[k],s[k]||{}); } } return s; } }catch(e){} return JSON.parse(JSON.stringify(DEF)); }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(C)); }catch(e){} }
+
+var MODES=[["tabata","TABATA"],["emom","EMOM"],["amrap","AMRAP"],["fortime","FOR TIME"],["chrono","CHRONO"]];
+
+function mmss(s){ s=Math.max(0,Math.round(s)); var m=Math.floor(s/60),r=s%60; return (m<10?"0":"")+m+":"+(r<10?"0":"")+r; }
+function hms(s){ s=Math.max(0,Math.floor(s)); var h=Math.floor(s/3600); return (h?h+":"+("0"+Math.floor(s%3600/60)).slice(-2):Math.floor(s/60))+":"+("0"+(s%60)).slice(-2); }
+function dur(s){ if(s<60) return s+"s"; var m=Math.floor(s/60),r=s%60; return m+"min"+(r?" "+r+"s":""); }
+
+/* ============ UI CONFIG ============ */
+function renderModes(){
+  var h=""; MODES.forEach(function(m){ h+='<button class="'+(C.mode===m[0]?"on":"")+'" onclick="setMode(\''+m[0]+'\')">'+m[1]+'</button>'; });
+  document.getElementById("modes").innerHTML=h;
+}
+function setMode(m){ C.mode=m; save(); renderAll(); }
+
+function stepper(lab,sub,path,val,step,min,max,fmt){
+  return '<div class="row"><div class="lab">'+lab+(sub?'<small>'+sub+'</small>':'')+'</div>'+
+  '<div class="step"><button onclick="bump(\''+path+'\',-'+step+','+min+','+max+')">−</button>'+
+  '<div class="val" id="v-'+path.replace(/\./g,"-")+'">'+fmt(val)+'</div>'+
+  '<button onclick="bump(\''+path+'\','+step+','+min+','+max+')">+</button></div></div>';
+}
+function bump(path,d,min,max){
+  var p=path.split("."),o=C[p[0]];
+  var v=o[p[1]]+d; if(v<min)v=min; if(v>max)v=max; o[p[1]]=v; save(); renderCfg(); renderSum();
+}
+function sec(v){ return v+"s"; }
+function num(v){ return v; }
+function mn(v){ return mmss(v); }
+
+function renderCfg(){
+  var h="",m=C.mode;
+  if(m==="tabata"){
+    var t=C.tabata;
+    h+='<div class="card"><div class="eyebrow">Tabata · intervalles</div>';
+    h+='<div class="presets">'+
+       '<button onclick="preTab(20,10,8,1)">20/10 ×8</button>'+
+       '<button onclick="preTab(30,30,10,1)">30/30 ×10</button>'+
+       '<button onclick="preTab(40,20,8,2)">40/20 ×8 · 2 blocs</button>'+
+       '<button onclick="preTab(45,15,10,1)">45/15 ×10</button>'+
+       '<button onclick="preTab(60,30,6,2)">60/30 ×6 · 2 blocs</button></div>';
+    h+=stepper("Effort","","tabata.work",t.work,5,5,600,sec);
+    h+=stepper("Récup","","tabata.rest",t.rest,5,0,600,sec);
+    h+=stepper("Rounds","par bloc","tabata.rounds",t.rounds,1,1,60,num);
+    h+=stepper("Blocs","séries de rounds","tabata.sets",t.sets,1,1,20,num);
+    if(t.sets>1) h+=stepper("Récup entre blocs","","tabata.setrest",t.setrest,15,0,900,sec);
+    h+=stepper("Préparation","décompte de départ","tabata.prep",t.prep,5,0,60,sec);
+    h+='</div>';
+  }
+  if(m==="emom"){
+    var e=C.emom;
+    h+='<div class="card"><div class="eyebrow">EMOM · une série par intervalle</div>';
+    h+='<div class="presets"><button onclick="preEmom(60,10)">60s ×10</button><button onclick="preEmom(60,20)">60s ×20</button><button onclick="preEmom(90,12)">90s ×12</button><button onclick="preEmom(120,10)">2min ×10</button><button onclick="preEmom(30,20)">30s ×20 (E30)</button></div>';
+    h+=stepper("Intervalle","","emom.interval",e.interval,15,10,600,sec);
+    h+=stepper("Rounds","","emom.rounds",e.rounds,1,1,60,num);
+    h+=stepper("Préparation","","emom.prep",e.prep,5,0,60,sec);
+    h+='</div>';
+  }
+  if(m==="amrap"){
+    var a=C.amrap;
+    h+='<div class="card"><div class="eyebrow">AMRAP · compte à rebours</div>';
+    h+='<div class="presets"><button onclick="preAm(360)">6 min</button><button onclick="preAm(600)">10 min</button><button onclick="preAm(720)">12 min</button><button onclick="preAm(900)">15 min</button><button onclick="preAm(1200)">20 min</button></div>';
+    h+=stepper("Durée","","amrap.dur",a.dur,60,60,7200,mn);
+    h+=stepper("Préparation","","amrap.prep",a.prep,5,0,60,sec);
+    h+='</div>';
+  }
+  if(m==="fortime"){
+    var f=C.fortime;
+    h+='<div class="card"><div class="eyebrow">For Time · chrono montant + time cap</div>';
+    h+='<div class="presets"><button onclick="preFt(0)">Sans cap</button><button onclick="preFt(600)">Cap 10 min</button><button onclick="preFt(1200)">Cap 20 min</button><button onclick="preFt(1800)">Cap 30 min</button></div>';
+    h+=stepper("Time cap","0 = illimité","fortime.cap",f.cap,60,0,7200,mn);
+    h+=stepper("Préparation","","fortime.prep",f.prep,5,0,60,sec);
+    h+='</div>';
+  }
+  if(m==="chrono"){
+    var c=C.chrono;
+    h+='<div class="card"><div class="eyebrow">Chrono libre + récup à la demande</div>';
+    h+='<div class="desc">Le chrono tourne en continu. Pendant l\'effort tu lances une récup (bouton) : elle décompte par-dessus et bipe à la fin, sans arrêter le chrono. Bouton TOUR pour marquer un split.</div>';
+    h+=stepper("Récup par défaut","utilisée par le gros bouton","chrono.recup",c.recup,15,15,900,sec);
+    h+='</div>';
+  }
+  document.getElementById("cfg").innerHTML=h;
+}
+function preTab(w,r,n,s){ C.tabata.work=w; C.tabata.rest=r; C.tabata.rounds=n; C.tabata.sets=s; save(); renderCfg(); renderSum(); }
+function preEmom(i,n){ C.emom.interval=i; C.emom.rounds=n; save(); renderCfg(); renderSum(); }
+function preAm(d){ C.amrap.dur=d; save(); renderCfg(); renderSum(); }
+function preFt(c){ C.fortime.cap=c; save(); renderCfg(); renderSum(); }
+
+function totalOf(segs){ var t=0; segs.forEach(function(s){ t+=s.d; }); return t; }
+function renderSum(){
+  var m=C.mode,txt="";
+  if(m==="tabata"){ var t=C.tabata; var tot=totalOf(buildSegs()); txt="Total <b>"+dur(tot)+"</b> · "+(t.rounds*t.sets)+" rounds"; }
+  if(m==="emom"){ var e=C.emom; txt="Total <b>"+dur(e.prep+e.interval*e.rounds)+"</b> · "+e.rounds+" rounds"; }
+  if(m==="amrap"){ txt="Total <b>"+dur(C.amrap.dur)+"</b>"; }
+  if(m==="fortime"){ txt=C.fortime.cap? "Time cap <b>"+dur(C.fortime.cap)+"</b>" : "Chrono montant, <b>sans cap</b>"; }
+  if(m==="chrono"){ txt="Récup par défaut <b>"+dur(C.chrono.recup)+"</b>"; }
+  document.getElementById("sum").innerHTML=txt;
+}
+function renderAll(){ renderModes(); renderCfg(); renderSum(); }
+
+/* ============ CONSTRUCTION DES SEGMENTS ============ */
+function buildSegs(){
+  var segs=[],m=C.mode;
+  if(m==="tabata"){
+    var t=C.tabata;
+    if(t.prep>0) segs.push({k:"prep",d:t.prep,lab:"PRÊT ?"});
+    for(var s=1;s<=t.sets;s++){
+      for(var r=1;r<=t.rounds;r++){
+        segs.push({k:"work",d:t.work,lab:"EFFORT",r:r,rn:t.rounds,s:s,sn:t.sets});
+        var last=(r===t.rounds&&s===t.sets);
+        if(!last && t.rest>0 && r<t.rounds) segs.push({k:"rest",d:t.rest,lab:"RÉCUP",r:r,rn:t.rounds,s:s,sn:t.sets});
+      }
+      if(s<t.sets && t.setrest>0) segs.push({k:"rest",d:t.setrest,lab:"RÉCUP BLOC",s:s,sn:t.sets});
+    }
+  }
+  if(m==="emom"){
+    var e=C.emom;
+    if(e.prep>0) segs.push({k:"prep",d:e.prep,lab:"PRÊT ?"});
+    for(var i=1;i<=e.rounds;i++) segs.push({k:"work",d:e.interval,lab:"ROUND "+i,r:i,rn:e.rounds});
+  }
+  if(m==="amrap"){
+    var a=C.amrap;
+    if(a.prep>0) segs.push({k:"prep",d:a.prep,lab:"PRÊT ?"});
+    segs.push({k:"work",d:a.dur,lab:"AMRAP"});
+  }
+  if(m==="fortime"){
+    var f=C.fortime;
+    if(f.prep>0) segs.push({k:"prep",d:f.prep,lab:"PRÊT ?"});
+    segs.push({k:"up",d:f.cap>0?f.cap:0,lab:"FOR TIME"});
+  }
+  if(m==="chrono"){
+    segs.push({k:"chrono",d:0,lab:"CHRONO"});
+  }
+  return segs;
+}
+
+/* ============ MOTEUR ============ */
+var R={active:false,paused:false,segs:[],i:0,end:0,left:0,upStart:0,upAcc:0,tick:null,lastSec:-1,laps:[],rEnd:0,rLeft:0,rActive:false,mode:""};
+
+function start(){
+  unlockAudio(); reqWake();
+  R.segs=buildSegs(); if(!R.segs.length) return;
+  R.active=true; R.paused=false; R.i=-1; R.laps=[]; R.upAcc=0; R.rActive=false; R.mode=C.mode;
+  document.getElementById("run").classList.add("on");
+  document.getElementById("skipBtn").style.display=(C.mode==="chrono")?"none":"";
+  document.getElementById("laps").style.display=(C.mode==="chrono")?"":"none";
+  document.getElementById("recupBox").style.display=(C.mode==="chrono")?"":"none";
+  if(C.mode==="chrono") renderRecupBtns();
+  nextSeg();
+  if(R.tick) clearInterval(R.tick);
+  R.tick=setInterval(loop,80);
+}
+
+function nextSeg(){
+  R.i++;
+  if(R.i>=R.segs.length){ finish(); return; }
+  var s=R.segs[R.i];
+  R.lastSec=-1;
+  if(s.k==="up"||s.k==="chrono"){ R.upStart=Date.now(); R.upAcc=0; R.end=s.d>0?Date.now()+s.d*1000:0; }
+  else { R.end=Date.now()+s.d*1000; }
+  paint(s);
+  if(s.k==="work") sigWork(); else if(s.k==="rest") sigRest(); else if(s.k==="up"||s.k==="chrono") sigWork();
+}
+
+function paint(s){
+  var run=document.getElementById("run");
+  run.className="on "+(s.k==="chrono"?"chrono":s.k==="up"?"work":s.k);
+  if(R.paused) run.classList.add("paused");
+  document.getElementById("phase").textContent=s.lab;
+  var sub="";
+  if(s.r&&s.rn) sub="Round "+s.r+" / "+s.rn+(s.sn>1?"  ·  Bloc "+s.s+" / "+s.sn:"");
+  else if(s.sn>1&&s.s) sub="Bloc "+s.s+" / "+s.sn;
+  document.getElementById("sub").textContent=sub;
+  var nx=R.segs[R.i+1];
+  document.getElementById("nextup").textContent=nx?("ensuite · "+nx.lab+(nx.d?" "+dur(nx.d):"")):"";
+  document.getElementById("topL").textContent=({tabata:"Tabata",emom:"EMOM",amrap:"AMRAP",fortime:"For Time",chrono:"Chrono"})[R.mode]||"";
+}
+
+function loop(){
+  if(!R.active||R.paused) return;
+  var s=R.segs[R.i],now=Date.now();
+  if(s.k==="chrono"||s.k==="up"){
+    var el=(now-R.upStart)/1000+R.upAcc;
+    document.getElementById("clock").textContent=hms(el);
+    document.getElementById("topR").textContent=(s.k==="up"&&s.d>0)?("cap "+dur(s.d)):"";
+    if(s.k==="up"&&s.d>0){
+      setBar(el/s.d);
+      var rem=s.d-el;
+      if(rem<=3&&rem>0){ var sc=Math.ceil(rem); if(sc!==R.lastSec){R.lastSec=sc;sigTick();} }
+      if(rem<=0){ finish(); return; }
+    }
+    if(s.k==="chrono"){ tickRecup(now); document.getElementById("topR").textContent=R.laps.length?(R.laps.length+" tours"):""; }
+  } else {
+    var left=(R.end-now)/1000;
+    if(left<0) left=0;
+    document.getElementById("clock").textContent=mmss(left);
+    setBar(1-(left/(s.d||1)));
+    var totLeft=segRemaining(left);
+    document.getElementById("topR").textContent=totLeft!=null?("reste "+hms(totLeft)):"";
+    var c=Math.ceil(left);
+    if(c<=3&&c>0&&c!==R.lastSec){ R.lastSec=c; sigTick(); }
+    if(left<=0){ nextSeg(); }
+  }
+}
+function segRemaining(curLeft){
+  if(R.mode==="chrono") return null;
+  var t=curLeft;
+  for(var j=R.i+1;j<R.segs.length;j++) t+=R.segs[j].d;
+  return t;
+}
+function setBar(p){ if(p<0)p=0; if(p>1)p=1; document.querySelector("#bar i").style.width=(p*100)+"%"; }
+
+function togglePause(){
+  if(!R.active) return;
+  var s=R.segs[R.i],now=Date.now();
+  if(!R.paused){
+    R.paused=true;
+    if(s.k==="chrono"||s.k==="up"){ R.upAcc+=(now-R.upStart)/1000; }
+    else { R.left=R.end-now; }
+    if(R.rActive) R.rLeft=R.rEnd-now;
+    document.getElementById("run").classList.add("paused");
+    document.getElementById("ppLbl").textContent="REPRENDRE";
+    relWake();
+  } else {
+    R.paused=false;
+    if(s.k==="chrono"||s.k==="up"){ R.upStart=Date.now(); }
+    else { R.end=Date.now()+R.left; }
+    if(R.rActive) R.rEnd=Date.now()+R.rLeft;
+    document.getElementById("run").classList.remove("paused");
+    document.getElementById("ppLbl").textContent="PAUSE";
+    reqWake();
+  }
+}
+function skip(){ if(!R.active) return; if(R.paused) togglePause(); nextSeg(); }
+
+function finish(){
+  sigEnd();
+  var run=document.getElementById("run");
+  run.className="on done";
+  document.getElementById("phase").textContent="TERMINÉ";
+  document.getElementById("nextup").textContent="";
+  document.getElementById("topR").textContent="";
+  setBar(1);
+  if(R.tick){ clearInterval(R.tick); R.tick=null; }
+  R.active=false; relWake();
+  document.getElementById("ppLbl").textContent="PAUSE";
+}
+function stopRun(){
+  if(R.tick){ clearInterval(R.tick); R.tick=null; }
+  R.active=false; R.paused=false; R.rActive=false;
+  document.getElementById("run").className="";
+  document.getElementById("ppLbl").textContent="PAUSE";
+  relWake();
+}
+
+/* ============ CHRONO : TOURS + RÉCUP ============ */
+function renderRecupBtns(){
+  var d=C.chrono.recup;
+  var h='<button class="chip" onclick="lap()">TOUR</button>';
+  [30,45,60,90,120].forEach(function(v){ h+='<button class="chip" onclick="startRecup('+v+')">'+(v<60?v+"s":(v/60)+"min")+'</button>'; });
+  h+='<button class="chip" onclick="startRecup('+d+')" style="background:var(--acc2);color:#12080a">RÉCUP '+dur(d)+'</button>';
+  document.getElementById("recupBtns").innerHTML=h;
+  document.getElementById("recupClock").textContent="--:--";
+}
+function startRecup(v){ unlockAudio(); R.rActive=true; R.rEnd=Date.now()+v*1000; R.rLast=-1; sigRest(); }
+function tickRecup(now){
+  var el=document.getElementById("recupClock");
+  if(!R.rActive){ el.textContent="--:--"; return; }
+  var left=(R.rEnd-now)/1000;
+  el.textContent=mmss(left);
+  var c=Math.ceil(left);
+  if(c<=3&&c>0&&c!==R.rLast){ R.rLast=c; sigTick(); }
+  if(left<=0){ R.rActive=false; el.textContent="GO"; sigWork(); setTimeout(function(){ if(!R.rActive) el.textContent="--:--"; },2500); }
+}
+function lap(){
+  var s=R.segs[R.i]; if(!s||s.k!=="chrono") return;
+  var el=(Date.now()-R.upStart)/1000+R.upAcc;
+  var prev=R.laps.length?R.laps[R.laps.length-1].t:0;
+  R.laps.push({t:el,d:el-prev});
+  var h="";
+  for(var i=R.laps.length-1;i>=0;i--){ h+='<div><span>Tour '+(i+1)+'</span><span>'+hms(R.laps[i].d)+'</span><span style="opacity:.5">'+hms(R.laps[i].t)+'</span></div>'; }
+  document.getElementById("laps").innerHTML=h;
+  beep(880,.1,.5);
+}
+
+/* ============ BOOT ============ */
+document.addEventListener("click",unlockAudio,{once:true});
+document.addEventListener("touchstart",unlockAudio,{once:true});
+renderAll();
+</script>
+</body>
+</html>
