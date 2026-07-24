@@ -62,12 +62,12 @@ header h1 span{color:var(--acc)}
 #run .acts{display:flex;gap:10px}
 #run .acts button{flex:1;border-radius:11px;padding:16px 8px;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;border:2px solid currentColor;background:transparent;color:inherit;cursor:pointer}
 #run .acts button.solid{background:currentColor;border-color:currentColor}
-#run .acts button.solid span{color:var(--bg)}
-#run.work{background:var(--acc);color:#0d0d0f}
-#run.rest{background:var(--acc2);color:#12080a}
-#run.prep{background:var(--blue);color:#06131b}
-#run.done{background:var(--grn);color:#04140a}
-#run.chrono{background:var(--bg);color:var(--txt)}
+#run .acts button.solid span{color:var(--onsolid,#0d0d0f)}
+#run.work{background:var(--acc);color:#0d0d0f;--onsolid:var(--acc)}
+#run.rest{background:var(--acc2);color:#12080a;--onsolid:var(--acc2)}
+#run.prep{background:var(--blue);color:#06131b;--onsolid:var(--blue)}
+#run.done{background:var(--grn);color:#04140a;--onsolid:var(--grn)}
+#run.chrono{background:var(--bg);color:var(--txt);--onsolid:var(--bg)}
 #run.paused{filter:saturate(.35) brightness(.8)}
 
 /* ---- chrono ---- */
