@@ -298,6 +298,7 @@ function start(){
   nextSeg();
   if(R.tick) clearInterval(R.tick);
   R.tick=setInterval(loop,80);
+  saveRun();
 }
 
 function nextSeg(){
@@ -308,6 +309,7 @@ function nextSeg(){
   if(s.k==="up"||s.k==="chrono"){ R.upStart=Date.now(); R.upAcc=0; R.end=s.d>0?Date.now()+s.d*1000:0; }
   else { R.end=Date.now()+s.d*1000; }
   paint(s);
+  saveRun();
   if(s.k==="work") sigWork(); else if(s.k==="rest") sigRest(); else if(s.k==="up"||s.k==="chrono") sigWork();
 }
 
@@ -379,6 +381,7 @@ function togglePause(){
     document.getElementById("ppLbl").textContent="PAUSE";
     reqWake();
   }
+  saveRun();
 }
 function skip(){ if(!R.active) return; if(R.paused) togglePause(); nextSeg(); }
 
@@ -393,6 +396,7 @@ function finish(){
   if(R.tick){ clearInterval(R.tick); R.tick=null; }
   R.active=false; relWake();
   document.getElementById("ppLbl").textContent="PAUSE";
+  saveRun();
 }
 function stopRun(){
   if(R.tick){ clearInterval(R.tick); R.tick=null; }
@@ -400,6 +404,7 @@ function stopRun(){
   document.getElementById("run").className="";
   document.getElementById("ppLbl").textContent="PAUSE";
   relWake();
+  saveRun();
 }
 
 /* ============ CHRONO : TOURS + RÉCUP ============ */
@@ -411,7 +416,7 @@ function renderRecupBtns(){
   document.getElementById("recupBtns").innerHTML=h;
   document.getElementById("recupClock").textContent="--:--";
 }
-function startRecup(v){ unlockAudio(); R.rActive=true; R.rEnd=Date.now()+v*1000; R.rLast=-1; sigRest(); }
+function startRecup(v){ unlockAudio(); R.rActive=true; R.rEnd=Date.now()+v*1000; R.rLast=-1; sigRest(); saveRun(); }
 function tickRecup(now){
   var el=document.getElementById("recupClock");
   if(!R.rActive){ el.textContent="--:--"; return; }
@@ -426,16 +431,55 @@ function lap(){
   var el=(Date.now()-R.upStart)/1000+R.upAcc;
   var prev=R.laps.length?R.laps[R.laps.length-1].t:0;
   R.laps.push({t:el,d:el-prev});
+  renderLaps();
+  saveRun();
+  beep(880,.1,.5);
+}
+function renderLaps(){
   var h="";
   for(var i=R.laps.length-1;i>=0;i--){ h+='<div><span>Tour '+(i+1)+'</span><span>'+hms(R.laps[i].d)+'</span><span style="opacity:.5">'+hms(R.laps[i].t)+'</span></div>'; }
   document.getElementById("laps").innerHTML=h;
-  beep(880,.1,.5);
 }
+
+
+/* ============ LV : persistance du run (survit au rechargement d'onglet) ============ */
+var RKEY="lvtimer:run:v1";
+function saveRun(){
+  try{
+    if(!R.active){ localStorage.removeItem(RKEY); return; }
+    var o={}; for(var k in R){ if(k!=="tick") o[k]=R[k]; }
+    localStorage.setItem(RKEY, JSON.stringify({t:Date.now(), cfg:C, R:o}));
+  }catch(e){}
+}
+function restoreRun(){
+  try{
+    var p=JSON.parse(localStorage.getItem(RKEY));
+    if(!p||!p.R||!p.R.active) return false;
+    if(Date.now()-p.t > 12*3600*1000){ localStorage.removeItem(RKEY); return false; }
+    if(p.cfg){ C=p.cfg; renderAll(); }
+    for(var k in p.R){ R[k]=p.R[k]; }
+    R.tick=null;
+    document.getElementById("run").classList.add("on");
+    document.getElementById("skipBtn").style.display=(R.mode==="chrono")?"none":"";
+    document.getElementById("laps").style.display=(R.mode==="chrono")?"":"none";
+    document.getElementById("recupBox").style.display=(R.mode==="chrono")?"":"none";
+    if(R.mode==="chrono"){ renderRecupBtns(); renderLaps(); }
+    var s=R.segs[R.i]; if(s) paint(s);
+    document.getElementById("ppLbl").textContent=R.paused?"REPRENDRE":"PAUSE";
+    if(!R.paused) reqWake();
+    R.tick=setInterval(loop,80);
+    return true;
+  }catch(e){ try{localStorage.removeItem(RKEY);}catch(e2){} return false; }
+}
+document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="hidden") saveRun(); });
+window.addEventListener("pagehide",saveRun);
+setInterval(function(){ if(R.active) saveRun(); },2000);
 
 /* ============ BOOT ============ */
 document.addEventListener("click",unlockAudio,{once:true});
 document.addEventListener("touchstart",unlockAudio,{once:true});
 renderAll();
+restoreRun();
 </script>
 </body>
 </html>
