@@ -102,6 +102,7 @@ textarea{width:100%;padding:10px;background:var(--surf2);border:1px solid var(--
 .export-btn{width:100%;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;background:var(--acc);color:#000;border:none;border-radius:10px;cursor:pointer;margin-top:6px;}
 .export-out{margin-top:10px;padding:12px;background:var(--surf2);border:1px solid var(--bdr);border-radius:8px;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;display:none;}
 </style>
+<script src="/lvnav.js"></script>
 </head>
 <body>
 
@@ -413,6 +414,16 @@ function startTabata(){if(tabRunning)return;tabRunning=true;tabInterval=setInter
 function stopTabata(){clearInterval(tabInterval);tabRunning=false;tabPhase='effort';tabRound=1;tabRemain=20;document.getElementById('tab-display').textContent='00:20';document.getElementById('tab-display').style.color='var(--acc2)';document.getElementById('tab-phase').textContent='EFFORT';document.getElementById('tab-phase').style.color='var(--acc2)';document.getElementById('tab-round').textContent='Round 1 / 8';}
 var wl=null;function reqWL(){if('wakeLock' in navigator)navigator.wakeLock.request('screen').then(function(w){wl=w;}).catch(function(){});}reqWL();document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')reqWL();});
 function genExport(){var rpe=document.getElementById('rpe-val').value||'–',j=document.getElementById('jambes-val').value||'–',zp=document.getElementById('zp-val').value||'–',n=document.getElementById('notes-val').value||'';var done=Object.keys(doneSeries).length;var txt=['=== RENFO BLOC 1 — FONDATION (provisoire) ===','Date : '+new Date().toLocaleDateString('fr-FR'),'','Séries : '+done+' / '+totalSeries,'','A1 — Tractions pronation 3×6-8 + Développé incliné 3×10','B1 — RDL KB 3×10 + Rowing haltère 3×10/c','C1 — Step-down excentrique 3×8/c + Mollets 3×15','D1 — Copenhagen genou sur banc 3×20-30s + Pallof 3×12/c','Tabata — Dead bug 8 rounds','','RPE : '+rpe+'/10','Jambes : '+j+'/10','ZP : '+zp+'/10',n?'\nNotes : '+n:'','','→ Provisoire — recalibrer fin de récup (~6 juil)'].join('\n');document.getElementById('export-out').textContent=txt;document.getElementById('export-out').style.display='block';if(navigator.clipboard)navigator.clipboard.writeText(txt).catch(function(){});}
+</script>
+<script>
+/* ============ LV : memoire de navigation ============ */
+var lvRestoring=false;
+if(window.LVNAV){
+  LVNAV.init({ app:"renfo-b1", sections:'details, .sec, .acc',
+    snapshot:function(){ return {}; },
+    restore:function(s){ lvRestoring=true; try{  }catch(e){} lvRestoring=false; }
+  });
+}
 </script>
 </body>
 </html>
