@@ -127,6 +127,7 @@ textarea.exp{width:100%;height:200px;background:var(--surf2);border:1px solid va
 .ztab td.zl{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--acc)}
 .foot{text-align:center;font-size:10px;color:var(--mut);margin-top:24px;letter-spacing:.5px}
 </style>
+<script src="/lvnav.js"></script>
 </head>
 <body>
 <header>
@@ -602,6 +603,7 @@ function renderRenfo(){
     +'<iframe src="renfo-b1/index.html" allow="screen-wake-lock" style="width:100%;height:78vh;border:1px solid var(--bdr);border-radius:10px;background:var(--bg)"></iframe>';
 }
 function setTab(name){
+  lvTab=name; if(!lvRestoring&&window.LVNAV)LVNAV.push();
   var tabs=document.querySelectorAll(".tab");for(var i=0;i<tabs.length;i++)tabs[i].classList.toggle("active",tabs[i].getAttribute("data-tab")===name);
   document.getElementById("view-cal").classList.toggle("active",name==="cal");
   document.getElementById("view-macro").classList.toggle("active",name==="macro");
@@ -622,6 +624,16 @@ function initBanner(){
 }
 
 renderDows();renderCal();renderRPE();initBanner();renderNext();renderZones();renderMacro();
+</script>
+<script>
+/* ============ LV : memoire de navigation ============ */
+var lvRestoring=false; var lvTab="cal";
+if(window.LVNAV){
+  LVNAV.init({ app:"plan", sections:'details, .sec',
+    snapshot:function(){ return {t:lvTab}; },
+    restore:function(s){ lvRestoring=true; try{ if(s&&s.t)setTab(s.t); }catch(e){} lvRestoring=false; }
+  });
+}
 </script>
 </body>
 </html>
