@@ -70,6 +70,16 @@ header h1 span{color:var(--acc)}
 #run.chrono{background:var(--bg);color:var(--txt);--onsolid:var(--bg)}
 #run.paused{filter:saturate(.35) brightness(.8)}
 
+/* ---- LV : horloge + compteur de series ---- */
+#lvRow{display:flex;gap:10px;width:100%;max-width:420px;margin-top:14px;align-items:stretch}
+#nowClock{flex:1;border:2px solid currentColor;border-radius:12px;padding:8px 6px;text-align:center;opacity:.85}
+#serieBox{flex:1.2;display:none;border:2px solid currentColor;border-radius:12px;overflow:hidden}
+#lvRow .lab{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;opacity:.65;font-weight:700}
+#lvRow .val{font-family:'Bebas Neue',sans-serif;font-size:38px;line-height:1;letter-spacing:2px;font-variant-numeric:tabular-nums}
+#serieHit{width:100%;background:transparent;border:none;color:inherit;padding:8px 6px 6px;cursor:pointer;display:block}
+#serieHit:active{background:rgba(128,128,128,.18)}
+#serieRaz{width:100%;background:transparent;border:none;border-top:1px solid currentColor;color:inherit;font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:2px;padding:5px 0;opacity:.6;cursor:pointer}
+
 /* ---- chrono ---- */
 #recupBox{margin-top:6px}
 #recupClock{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:2px;line-height:1;color:var(--acc2)}
@@ -102,6 +112,13 @@ footer{text-align:center;font-size:11px;color:var(--mut);letter-spacing:1px;marg
     <div id="phase">PRÉPARATION</div>
     <div id="clock">00:00</div>
     <div id="sub"></div>
+    <div id="lvRow">
+      <div id="nowClock"><div class="lab">Heure</div><div class="val" id="nowVal">--:--</div></div>
+      <div id="serieBox">
+        <button id="serieHit" onclick="serieInc()"><span class="lab" style="display:block">Séries</span><span class="val" id="serieVal" style="display:block">0</span></button>
+        <button id="serieRaz" onclick="serieReset()">RAZ</button>
+      </div>
+    </div>
     <div id="recupBox" style="display:none">
       <div id="recupClock">00:00</div>
       <div style="text-align:center;margin-top:6px" id="recupBtns"></div>
@@ -284,7 +301,7 @@ function buildSegs(){
 }
 
 /* ============ MOTEUR ============ */
-var R={active:false,paused:false,segs:[],i:0,end:0,left:0,upStart:0,upAcc:0,tick:null,lastSec:-1,laps:[],rEnd:0,rLeft:0,rActive:false,mode:""};
+var R={active:false,paused:false,segs:[],i:0,end:0,left:0,upStart:0,upAcc:0,tick:null,lastSec:-1,laps:[],rEnd:0,rLeft:0,series:0,rActive:false,mode:""};
 
 function start(){
   unlockAudio(); reqWake();
@@ -294,6 +311,8 @@ function start(){
   document.getElementById("skipBtn").style.display=(C.mode==="chrono")?"none":"";
   document.getElementById("laps").style.display=(C.mode==="chrono")?"":"none";
   document.getElementById("recupBox").style.display=(C.mode==="chrono")?"":"none";
+  R.series=0; renderSerie();
+  document.getElementById("serieBox").style.display=(C.mode==="chrono")?"":"none";
   if(C.mode==="chrono") renderRecupBtns();
   nextSeg();
   if(R.tick) clearInterval(R.tick);
@@ -442,6 +461,22 @@ function renderLaps(){
 }
 
 
+/* ============ LV : HORLOGE + COMPTEUR DE SERIES ============ */
+function paintNow(){
+  var d=new Date();
+  var t=("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
+  var el=document.getElementById("nowVal"); if(el) el.textContent=t;
+}
+function renderSerie(){
+  var el=document.getElementById("serieVal"); if(el) el.textContent=(R.series||0);
+}
+function serieInc(){
+  R.series=(R.series||0)+1; renderSerie(); beep(700,.06,.35); buzz(35); saveRun();
+}
+function serieReset(){
+  R.series=0; renderSerie(); beep(420,.12,.35); buzz([40,50,40]); saveRun();
+}
+
 /* ============ LV : persistance du run (survit au rechargement d'onglet) ============ */
 var RKEY="lvtimer:run:v1";
 function saveRun(){
@@ -463,6 +498,8 @@ function restoreRun(){
     document.getElementById("skipBtn").style.display=(R.mode==="chrono")?"none":"";
     document.getElementById("laps").style.display=(R.mode==="chrono")?"":"none";
     document.getElementById("recupBox").style.display=(R.mode==="chrono")?"":"none";
+    document.getElementById("serieBox").style.display=(R.mode==="chrono")?"":"none";
+    renderSerie();
     if(R.mode==="chrono"){ renderRecupBtns(); renderLaps(); }
     var s=R.segs[R.i]; if(s) paint(s);
     document.getElementById("ppLbl").textContent=R.paused?"REPRENDRE":"PAUSE";
@@ -478,6 +515,8 @@ setInterval(function(){ if(R.active) saveRun(); },2000);
 /* ============ BOOT ============ */
 document.addEventListener("click",unlockAudio,{once:true});
 document.addEventListener("touchstart",unlockAudio,{once:true});
+paintNow();
+setInterval(paintNow,1000);
 renderAll();
 restoreRun();
 </script>
